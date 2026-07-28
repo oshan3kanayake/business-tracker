@@ -1800,6 +1800,11 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         // For tracking payment status changes
         let oldPaymentStatus = null;
 
+        // USD/LKR exchange rate, loaded once. Packages are priced in LKR; when a
+        // booking is paid in USD we convert the LKR total to a real USD amount
+        // (locked at booking time) so the income page shows the correct figure.
+        let bookingUsdRate = null;
+
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = '/'; return; }
             currentUser = user;
@@ -1809,6 +1814,15 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 currentUserData = doc.data();
                 hotelId = currentUserData.role === 'staff' ? currentUserData.hotelId : user.uid;
                 if (!hotelId) throw new Error('No hotel is assigned to this account.');
+
+                // Load the current USD/LKR rate (best-effort; used only for USD bookings)
+                try {
+                    const rateInfo = await ExchangeRateService.loadUsdToLkrRate(db);
+                    bookingUsdRate = rateInfo && rateInfo.rate ? rateInfo.rate : null;
+                } catch (e) {
+                    console.warn('Could not load exchange rate for bookings:', e);
+                    bookingUsdRate = null;
+                }
                 
                 // Update profile avatar with initials
                 const initialsElement = document.getElementById('avatarInitials');
@@ -2351,19 +2365,46 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             } else if (discType === 'fixed') {
                 discountAmount = discVal;
             }
-            const grandTotal = Math.max(0, baseTotal - discountAmount);
+            // grandTotal so far is in LKR (packages are priced in LKR).
+            const grandTotalLkr = Math.max(0, baseTotal - discountAmount);
 
+            // If the guest pays in USD, convert the LKR total to a real USD
+            // amount using the current rate, locked at booking time. This is the
+            // value stored on the booking + income, so the income page no longer
+            // multiplies an LKR number as if it were dollars.
+            const selectedCurrency = FinanceUtils.normalizeCurrency(
+                (document.getElementById('bookingCurrency') || {}).value || 'LKR'
+            );
+            let grandTotal = grandTotalLkr;
+            let currencyReady = true;
+            if (selectedCurrency === 'USD') {
+                if (bookingUsdRate && bookingUsdRate > 0) {
+                    grandTotal = Math.round((grandTotalLkr / bookingUsdRate) * 100) / 100;
+                } else {
+                    currencyReady = false; // rate not available; block USD save
+                }
+            }
+
+            const cur = selectedCurrency;
             const pbRoom = document.getElementById('pbRoom');
             const pbMeals = document.getElementById('pbMeals');
             const pbTotal = document.getElementById('pbTotal');
             if (pbRoom) pbRoom.textContent = `LKR ${roomRate.toLocaleString()} × ${nights} nights = LKR ${roomTotal.toLocaleString()}`;
             if (pbMeals) pbMeals.textContent = `LKR ${mealPrice.toLocaleString()} × ${guestCount} guests × ${nights} nights = LKR ${mealTotal.toLocaleString()}`;
-            if (pbTotal) pbTotal.textContent = 'LKR ' + grandTotal.toLocaleString();
+            if (pbTotal) {
+                if (cur === 'USD' && currencyReady) {
+                    pbTotal.textContent = `USD ${grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}  (from LKR ${grandTotalLkr.toLocaleString()})`;
+                } else if (cur === 'USD' && !currencyReady) {
+                    pbTotal.textContent = `LKR ${grandTotalLkr.toLocaleString()} — USD rate unavailable`;
+                } else {
+                    pbTotal.textContent = 'LKR ' + grandTotal.toLocaleString();
+                }
+            }
 
-            return { roomTotal, mealTotal, baseTotal, discountAmount, grandTotal, nights, roomRate, mealPrice };
+            return { roomTotal, mealTotal, baseTotal, discountAmount, grandTotal, grandTotalLkr, currency: cur, currencyReady, nights, roomRate, mealPrice };
         }
 
-        ['bookingRoom', 'bookingMeals', 'bookingGuestCount', 'bookingCheckIn', 'bookingCheckOut', 'bookingDiscountType', 'bookingDiscountValue'].forEach(id => {
+        ['bookingRoom', 'bookingMeals', 'bookingGuestCount', 'bookingCheckIn', 'bookingCheckOut', 'bookingDiscountType', 'bookingDiscountValue', 'bookingCurrency'].forEach(id => {
             const el = document.getElementById(id);
             if (el) {
                 el.addEventListener('change', calculatePrice);
@@ -2405,9 +2446,13 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     return;
                 }
 
-                const { grandTotal, discountAmount } = calculatePrice();
+                const { grandTotal, discountAmount, currencyReady } = calculatePrice();
                 if (grandTotal < 0) {
                     alert('Please check your dates and room selection.');
+                    return;
+                }
+                if (currency === 'USD' && !currencyReady) {
+                    alert('The USD exchange rate could not be loaded, so this USD booking cannot be saved correctly. Please try again in a moment, or switch the currency to LKR.');
                     return;
                 }
 
@@ -2603,6 +2648,20 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         discountAmount = discountValue;
                     }
                     newTotalAmount = Math.max(0, baseTotal - discountAmount);
+
+                    // Convert the LKR total to USD (locked) when paying in USD.
+                    // For 'checked_out_early' the manager types the actual paid
+                    // amount manually, so we treat it as already in the chosen
+                    // currency and do not convert it.
+                    if (FinanceUtils.normalizeCurrency(currency) === 'USD') {
+                        if (bookingUsdRate && bookingUsdRate > 0) {
+                            newTotalAmount = Math.round((newTotalAmount / bookingUsdRate) * 100) / 100;
+                        } else {
+                            alert('The USD exchange rate could not be loaded, so this USD booking cannot be saved correctly. Please try again in a moment, or switch the currency to LKR.');
+                            if (btn) { btn.textContent = 'Save Changes'; btn.disabled = false; }
+                            return;
+                        }
+                    }
                 }
 
                 const linkedIncome = await linkedBookingIncomeDocuments(id);
