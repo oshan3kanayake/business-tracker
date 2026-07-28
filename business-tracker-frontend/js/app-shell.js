@@ -92,6 +92,60 @@
         } catch (e) { _nativeAlert(message); }
     };
 
+    // ---------------- CONFIRM MODAL (styled) ----------------
+    function ensureConfirmStyles() {
+        if (document.getElementById('as-confirm-style')) return;
+        const st = document.createElement('style');
+        st.id = 'as-confirm-style';
+        st.textContent = `
+        .as-confirm-overlay{position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;background:rgba(15,18,28,.55);backdrop-filter:blur(5px);opacity:0;transition:opacity .2s;font-family:'Inter',system-ui,sans-serif;}
+        .as-confirm-overlay.in{opacity:1;}
+        .as-confirm{background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.3);width:min(420px,calc(100vw - 40px));padding:26px;transform:scale(.94);transition:transform .2s cubic-bezier(.16,1,.3,1);}
+        .as-confirm-overlay.in .as-confirm{transform:scale(1);}
+        .as-confirm__ic{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:#fee2e2;color:#dc2626;}
+        .as-confirm__ic svg{width:24px;height:24px;}
+        .as-confirm h3{font-size:1.15rem;font-weight:800;color:#1a2230;margin:0 0 6px;}
+        .as-confirm p{font-size:.9rem;color:#64708a;margin:0 0 22px;line-height:1.5;}
+        .as-confirm__row{display:flex;gap:10px;justify-content:flex-end;}
+        .as-confirm__btn{padding:10px 20px;border-radius:10px;font-size:.88rem;font-weight:700;cursor:pointer;border:1px solid #e6eaf1;background:#fff;color:#1a2230;transition:all .15s;}
+        .as-confirm__btn:hover{background:#f1f5f9;}
+        .as-confirm__btn.danger{background:#dc2626;color:#fff;border-color:#dc2626;}
+        .as-confirm__btn.danger:hover{background:#b91c1c;}`;
+        (document.head||document.documentElement).appendChild(st);
+    }
+    function asConfirm(message, opts) {
+        opts = opts || {};
+        ensureConfirmStyles();
+        return new Promise(resolve => {
+            const ov = document.createElement('div');
+            ov.className = 'as-confirm-overlay';
+            ov.innerHTML =
+                '<div class="as-confirm" role="dialog" aria-modal="true">' +
+                '<div class="as-confirm__ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></div>' +
+                '<h3></h3><p></p>' +
+                '<div class="as-confirm__row">' +
+                '<button class="as-confirm__btn" data-a="cancel">' + (opts.cancelText || 'Cancel') + '</button>' +
+                '<button class="as-confirm__btn danger" data-a="ok">' + (opts.okText || 'Confirm') + '</button>' +
+                '</div></div>';
+            ov.querySelector('h3').textContent = opts.title || 'Are you sure?';
+            ov.querySelector('p').textContent = message || '';
+            document.body.appendChild(ov);
+            requestAnimationFrame(() => ov.classList.add('in'));
+            function done(val) {
+                ov.classList.remove('in');
+                setTimeout(() => ov.remove(), 200);
+                resolve(val);
+            }
+            ov.addEventListener('click', e => {
+                const b = e.target.closest('button[data-a]');
+                if (b) return done(b.dataset.a === 'ok');
+                if (e.target === ov) done(false);
+            });
+            document.addEventListener('keydown', function esc(ev){ if(ev.key==='Escape'){document.removeEventListener('keydown',esc);done(false);} });
+        });
+    }
+    window.asConfirm = asConfirm;
+
     // ---------------- SIDEBAR POPULATION ----------------
     function initials(str) {
         return (str || 'U').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U';

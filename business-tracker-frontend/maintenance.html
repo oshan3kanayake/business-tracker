@@ -921,7 +921,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/app-shell.css?v=3">
 </head>
 <body class="as-body">
 
@@ -1422,7 +1422,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
         // --- DELETE ITEM ---
         async function deleteItem(id) {
-            if (!confirm('Are you sure you want to delete this maintenance record?')) return;
+            if (!(await asConfirm('Are you sure you want to delete this maintenance record?'))) return;
             try {
                 await db.collection('maintenance').doc(id).delete();
                 await loadMaintenance();
@@ -1582,7 +1582,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
-                if (confirm('Logout?')) { await auth.signOut(); window.location.href = '/'; }
+                if (await asConfirm('Are you sure you want to log out?', {title:'Log out', okText:'Logout'})) { await auth.signOut(); window.location.href = '/'; }
             });
         }
 
@@ -1794,6 +1794,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         }
     </script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js"></script>
+<script src="js/app-shell.js?v=3"></script>
 </body>
 </html>

@@ -1364,7 +1364,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         .room-select { padding:7px 10px; border:1px solid rgba(85,115,115,0.25); border-radius:6px; font-size:0.8rem; background:#fff; color:#1c1b16; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/app-shell.css?v=3">
 </head>
 <body class="as-body">
     <aside class="as-sidebar">
@@ -1598,7 +1598,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 if (act === 'pay-booking') await markBookingPaid(id);
                 else if (act === 'pay-order') await markOrderPaid(id);
                 else if (act === 'checkout') {
-                    if (!confirm('Check out this guest? This marks the booking Past + Paid and frees the room.')) { busy.delete(act+id); el.disabled=false; return; }
+                    if (!(await asConfirm('Check out this guest? This marks the booking Past + Paid and frees the room.'))) { busy.delete(act+id); el.disabled=false; return; }
                     await checkoutGuest(id);
                 }
                 await loadAll();
@@ -1654,6 +1654,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         });
     </script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js"></script>
+<script src="js/app-shell.js?v=3"></script>
 </body>
 </html>

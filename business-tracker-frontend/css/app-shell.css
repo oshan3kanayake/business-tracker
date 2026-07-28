@@ -463,3 +463,76 @@ body.as-body .as-hero__pill .p-meta { display:flex; flex-direction:column; line-
 body.as-body .as-hero__pill .p-val { font-size:1.25rem; font-weight:800; color:#fff; }
 body.as-body .as-hero__pill .p-lbl { font-size:.7rem; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
 @media (max-width:640px){ body.as-body .as-hero{padding:26px 22px;} body.as-body .as-hero__date{display:none;} body.as-body #greeting-txt{font-size:1.5rem !important;} }
+
+/* ================= FORCE CONSISTENCY (override page-specific CSS) ================= */
+/* Sidebar must render identically even where old CSS (restaurant.css / staff-accounts
+   inline styles) is still loaded. Force with !important. */
+body.as-body .as-sidebar {
+    position: fixed !important; top: 0 !important; left: 0 !important; bottom: 0 !important;
+    width: var(--as-sb-w) !important; height: 100vh !important;
+    background: linear-gradient(180deg, var(--as-sidebar) 0%, #14161f 100%) !important;
+    border-right: 1px solid var(--as-sidebar-line) !important;
+    display: flex !important; flex-direction: column !important; z-index: 1000 !important;
+    overflow: hidden !important; padding: 0 !important; box-shadow: none !important;
+}
+body.as-body .as-sidebar__scroll { flex: 1 1 auto !important; overflow-y: auto !important; padding: 0 14px !important; }
+body.as-body .as-nav a {
+    display: flex !important; align-items: center !important; gap: 12px !important;
+    padding: 11px 14px !important; border-radius: 10px !important; border-left: none !important;
+    color: rgba(255,255,255,.6) !important; font-size: .875rem !important; font-weight: 500 !important;
+    background: none; text-transform: none !important; letter-spacing: normal !important;
+}
+body.as-body .as-nav a.active {
+    background: linear-gradient(90deg, rgba(99,102,241,.22), rgba(139,92,246,.10)) !important;
+    color: #fff !important; border-left: none !important;
+}
+body.as-body .as-nav a:hover { background: rgba(255,255,255,.05) !important; color: #fff !important; }
+
+/* ---- Restaurant page: make its .btn / form match the rest ---- */
+body.as-body .btn {
+    padding: 11px 20px !important; border-radius: 10px !important; font-size: .85rem !important;
+    font-weight: 700 !important; border: none !important; cursor: pointer !important;
+    background: linear-gradient(135deg, var(--as-accent), var(--as-accent-2)) !important; color: #fff !important;
+    box-shadow: 0 8px 18px rgba(99,102,241,.28) !important; transition: transform .15s, filter .15s !important;
+    text-transform: none !important; letter-spacing: normal !important;
+}
+body.as-body .btn:hover { transform: translateY(-1px) !important; filter: brightness(1.05); }
+body.as-body .btn.secondary {
+    background: #fff !important; color: var(--as-ink) !important; border: 1px solid var(--as-border) !important;
+    box-shadow: none !important;
+}
+body.as-body .btn.secondary:hover { background: #f1f5f9 !important; }
+body.as-body .btn.danger { background: var(--as-danger) !important; color: #fff !important; box-shadow: 0 8px 18px rgba(220,38,38,.25) !important; }
+
+/* restaurant form grid + panels align with app cards */
+body.as-body .page-shell { width: auto !important; max-width: 1440px !important; margin: 0 auto !important; padding: 0 !important; }
+body.as-body .panel {
+    background: #fff !important; border: 1px solid var(--as-border) !important; border-radius: var(--as-radius) !important;
+    box-shadow: var(--as-shadow) !important; padding: 24px !important; margin-bottom: 22px !important; overflow: visible !important;
+}
+body.as-body .panel h2 { color: var(--as-ink) !important; font-size: 1.15rem !important; font-weight: 700 !important; text-transform: none !important; letter-spacing: normal !important; }
+body.as-body .form-grid { display: grid !important; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)) !important; gap: 16px !important; }
+body.as-body .form-grid .field { display: flex !important; flex-direction: column !important; gap: 6px !important; }
+body.as-body .form-grid .field.wide { grid-column: 1 / -1; }
+body.as-body .form-grid label, body.as-body .field label {
+    font-size: .72rem !important; font-weight: 600 !important; color: var(--as-ink-soft) !important;
+    text-transform: none !important; letter-spacing: normal !important;
+}
+body.as-body .items-heading h3 { color: var(--as-ink) !important; font-size: .95rem !important; font-weight: 700 !important; }
+body.as-body .item-row input, body.as-body .item-row select { background: #f8fafc !important; }
+body.as-body .order-total { color: var(--as-ink) !important; font-weight: 800 !important; }
+
+/* ---- Edit/Delete row action buttons — consistent everywhere ---- */
+body.as-body .strip-link-btn, body.as-body .edit-strip-btn, body.as-body .delete-strip-btn,
+body.as-body .action-btn, body.as-body .row-actions .btn {
+    display: inline-flex !important; align-items: center !important; gap: 5px !important;
+    padding: 7px 13px !important; border-radius: 8px !important; font-size: .78rem !important; font-weight: 600 !important;
+    border: 1px solid var(--as-border) !important; background: #fff !important; color: var(--as-ink) !important;
+    cursor: pointer !important; transition: all .15s ease !important;
+}
+body.as-body .edit-strip-btn:hover { background: var(--as-accent-soft) !important; border-color: var(--as-accent) !important; color: var(--as-accent) !important; }
+body.as-body .delete-strip-btn { color: var(--as-danger) !important; }
+body.as-body .delete-strip-btn:hover { background: var(--as-danger-soft) !important; border-color: var(--as-danger) !important; }
+
+/* staff-accounts: neutralize its old inline body padding + sidebar styles that clash */
+body.as-body.as-body { padding-left: var(--as-sb-w) !important; }

@@ -716,7 +716,7 @@
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/app-shell.css?v=3">
 </head>
 
 <body class="as-body">
@@ -916,11 +916,6 @@
                         </button>
                     </section>
 
-                    <div class="security-note">
-                        The backend verifies that the current user is a Manager and
-                        derives the hotel ID from the Manager’s own users/{uid} profile.
-                        This form never sends a browser-selected hotel ID.
-                    </div>
                 </div>
             </article>
 
@@ -1468,7 +1463,7 @@
         logoutButton.addEventListener("click", async event => {
             event.preventDefault();
 
-            if (!window.confirm("Logout?")) {
+            if (!(await asConfirm("Are you sure you want to log out?", {title:"Log out", okText:"Logout"}))) {
                 return;
             }
 
@@ -1539,6 +1534,6 @@
         initialisePage();
     </script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js"></script>
+<script src="js/app-shell.js?v=3"></script>
 </body>
 </html>

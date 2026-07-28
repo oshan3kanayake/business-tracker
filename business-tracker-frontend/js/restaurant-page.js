@@ -219,7 +219,7 @@
         const guestSelect = byId('guestLink');
         if (guestSelect) {
             const keepVal = guestSelect.value;
-            guestSelect.innerHTML = '<option value="">🚶 Walk-in customer (no room)</option>' +
+            guestSelect.innerHTML = '<option value="">Walk-in customer (no room)</option>' +
                 state.activeGuests.map(g =>
                     `<option value="${g.bookingId}">${escapeHtml(g.name)}${g.roomNumber ? ' — Room ' + escapeHtml(String(g.roomNumber)) : ''}${g.nic ? ' — NIC ' + escapeHtml(g.nic) : ''}${g.status === 'upcoming' ? ' (arriving)' : ''}</option>`
                 ).join('');
@@ -265,7 +265,7 @@
         });
         // Custom option: lets staff type a one-off item not on the menu.
         const isCustom = selectedName && !state.menuItems.some(m => m.name === selectedName);
-        opts.push(`<option value="__custom__" ${isCustom ? 'selected' : ''}>✏️ Custom item…</option>`);
+        opts.push(`<option value="__custom__" ${isCustom ? 'selected' : ''}>Custom item…</option>`);
         return opts.join('');
     }
 
@@ -445,7 +445,8 @@
     }
 
     async function deleteOrder(id) {
-        if (!canManage() || !confirm('Delete this restaurant order and any linked income?')) return;
+        if (!canManage()) return;
+        if (!(await window.asConfirm('Delete this restaurant order and any linked income?', {title:'Delete order'}))) return;
         const order = state.orders.find(item => item.id === id);
         if (!order || order.hotelId !== state.hotelId) return;
         const batch = db.batch();
@@ -621,7 +622,7 @@
     }
 
     async function deleteMenuItem(id) {
-        if (!confirm('Remove this item from the menu?')) return;
+        if (!(await window.asConfirm('Remove this item from the menu?', {title:'Remove menu item'}))) return;
         try { await db.collection('buffetItems').doc(id).delete(); await loadMenuItems(); }
         catch (e) { alert('Could not remove item: ' + e.message); }
     }

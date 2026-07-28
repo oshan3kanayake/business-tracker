@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/app-shell.css?v=3">
 </head>
 <body class="as-body" data-mode="manager">
     <aside class="as-sidebar">
@@ -63,7 +63,7 @@
         </section>
 
         <section class="panel" id="menuPanel" data-requires="manager">
-            <h2>🍴 Menu Items</h2>
+            <h2>Menu Items</h2>
             <p class="menu-hint">Save your restaurant items once here. When taking an order you can pick them from a dropdown and the price fills in automatically.</p>
             <form id="menuItemForm" class="menu-add-row">
                 <input type="text" id="menuItemName" placeholder="Item name (e.g. Chicken Fried Rice)" required>
@@ -79,7 +79,7 @@
                 <div class="form-grid">
                     <div class="field wide"><label for="guestLink">Link to checked-in guest (leave as Walk-in if not a room guest)</label>
                         <select id="guestLink">
-                            <option value="">🚶 Walk-in customer (no room)</option>
+                            <option value="">Walk-in customer (no room)</option>
                         </select>
                     </div>
                     <div class="field"><label for="orderDate">Date</label><input id="orderDate" type="date" required></div>
@@ -125,6 +125,6 @@
     </script>
     <script src="js/finance-utils.js"></script><script src="js/exchange-rate.js"></script><script src="js/restaurant-page.js"></script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js"></script>
+<script src="js/app-shell.js?v=3"></script>
 </body>
 </html>

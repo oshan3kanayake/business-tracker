@@ -1199,7 +1199,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/app-shell.css?v=3">
 </head>
 <body class="as-body">
 
@@ -1753,7 +1753,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
         // --- DELETE COMPLAINT ---
         async function deleteComplaint(id) {
-            if (!confirm('Delete this complaint permanently?')) return;
+            if (!(await asConfirm('Delete this complaint permanently?'))) return;
 
             try {
                 await db.collection('complaints').doc(id).delete();
@@ -2004,7 +2004,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                if (confirm('Are you sure you want to logout?')) {
+                if (await asConfirm('Are you sure you want to log out?', {title:'Log out', okText:'Logout'})) {
                     try {
                         await auth.signOut();
                         window.location.href = '/';
@@ -2223,6 +2223,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         }
     </script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js"></script>
+<script src="js/app-shell.js?v=3"></script>
 </body>
 </html>

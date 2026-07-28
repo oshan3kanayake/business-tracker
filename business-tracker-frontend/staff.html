@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css">
+    <link rel="stylesheet" href="css/app-shell.css?v=3">
 
     <!-- jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1969,7 +1969,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
         // --- DELETE STAFF ---
         async function deleteStaff(id) {
-            if (!confirm('Delete this staff member?')) return;
+            if (!(await asConfirm('Delete this staff member?'))) return;
             try {
                 await db.collection('staff').doc(id).delete();
                 loadStaffData();
@@ -2054,7 +2054,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
         // --- LOGOUT ---
         document.getElementById('logoutBtn').addEventListener('click', async () => {
-            if (confirm('Logout?')) { await auth.signOut(); window.location.href = '/'; }
+            if (await asConfirm('Are you sure you want to log out?', {title:'Log out', okText:'Logout'})) { await auth.signOut(); window.location.href = '/'; }
         });
 
         // --- TABS ---
@@ -2431,6 +2431,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         </div>
     </div>
 
-<script src="js/app-shell.js"></script>
+<script src="js/app-shell.js?v=3"></script>
 </body>
 </html>
