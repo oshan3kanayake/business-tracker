@@ -964,178 +964,32 @@ body { padding-left: var(--sb-w) !important; box-sizing: border-box !important; 
     <div class="as-main">
 
     <!-- Enlarged Hero Section -->
-    <section class="chrono-hero-viewport">
-        <div id="hero-canvas-box"></div>
-
-        <!-- Atmospheric glow layer (sits behind clouds, above canvas) -->
-        <div class="hero-atmosphere"></div>
-
-        <!-- Vector Sky Overlay Layer for Clouds -->
-        <div class="vector-sky-overlay-layer">
-            <!-- Cloud 1 - Large Left Hero Cloud -->
-            <div class="cloud-vector-node c1-node">
-                <svg viewBox="0 0 420 200" width="420" height="200">
-                    <defs>
-                        <radialGradient id="g1a" cx="40%" cy="30%" r="60%">
-                            <stop offset="0%" stop-color="#fff9f0"/>
-                            <stop offset="45%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="var(--cloud-shadow, #ddeeff)"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="110" cy="168" rx="95" ry="28" fill="rgba(170,200,240,0.35)"/>
-                    <ellipse cx="230" cy="175" rx="130" ry="30" fill="rgba(170,200,240,0.30)"/>
-                    <ellipse cx="340" cy="170" rx="80" ry="26" fill="rgba(170,200,240,0.28)"/>
-                    <ellipse cx="70" cy="155" rx="68" ry="48" fill="url(#g1a)"/>
-                    <ellipse cx="140" cy="140" rx="82" ry="62" fill="url(#g1a)"/>
-                    <ellipse cx="210" cy="125" rx="95" ry="78" fill="url(#g1a)"/>
-                    <ellipse cx="295" cy="138" rx="85" ry="65" fill="url(#g1a)"/>
-                    <ellipse cx="365" cy="150" rx="62" ry="50" fill="url(#g1a)"/>
-                    <ellipse cx="175" cy="105" rx="58" ry="45" fill="url(#g1a)"/>
-                    <ellipse cx="250" cy="88" rx="68" ry="55" fill="url(#g1a)"/>
-                    <ellipse cx="318" cy="108" rx="52" ry="42" fill="url(#g1a)"/>
-                    <ellipse cx="248" cy="62" rx="48" ry="40" fill="#fffef8"/>
-                    <ellipse cx="188" cy="90" rx="22" ry="14" fill="rgba(255,255,255,0.75)"/>
-                    <ellipse cx="258" cy="68" rx="18" ry="11" fill="rgba(255,255,255,0.80)"/>
-                    <ellipse cx="142" cy="122" rx="18" ry="11" fill="rgba(255,255,255,0.65)"/>
-                    <ellipse cx="215" cy="170" rx="175" ry="22" fill="rgba(160,195,235,0.22)"/>
-                </svg>
+    <section class="as-hero">
+        <div class="as-hero__inner">
+            <div>
+                <span class="as-hero__eyebrow">Operations Dashboard</span>
+                <h2 id="greeting-txt">Welcome back</h2>
+                <p id="subheading-txt" class="as-hero__sub">Here is what's happening at your hotel today.</p>
             </div>
-
-            <!-- Cloud 2 - Large Right Cloud -->
-            <div class="cloud-vector-node c2-node">
-                <svg viewBox="0 0 380 185" width="380" height="185">
-                    <defs>
-                        <radialGradient id="g2" cx="38%" cy="28%" r="58%">
-                            <stop offset="0%" stop-color="#fff8ee"/>
-                            <stop offset="40%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="var(--cloud-shadow, #ddeeff)"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="95" cy="152" rx="85" ry="26" fill="rgba(170,200,240,0.32)"/>
-                    <ellipse cx="220" cy="160" rx="120" ry="28" fill="rgba(170,200,240,0.28)"/>
-                    <ellipse cx="320" cy="155" rx="70" ry="24" fill="rgba(170,200,240,0.25)"/>
-                    <ellipse cx="60" cy="142" rx="58" ry="44" fill="url(#g2)"/>
-                    <ellipse cx="125" cy="128" rx="75" ry="58" fill="url(#g2)"/>
-                    <ellipse cx="200" cy="112" rx="88" ry="72" fill="url(#g2)"/>
-                    <ellipse cx="278" cy="126" rx="75" ry="60" fill="url(#g2)"/>
-                    <ellipse cx="340" cy="140" rx="55" ry="44" fill="url(#g2)"/>
-                    <ellipse cx="165" cy="92" rx="54" ry="42" fill="url(#g2)"/>
-                    <ellipse cx="232" cy="74" rx="62" ry="52" fill="url(#g2)"/>
-                    <ellipse cx="295" cy="95" rx="48" ry="38" fill="url(#g2)"/>
-                    <ellipse cx="230" cy="48" rx="42" ry="36" fill="#fffef6"/>
-                    <ellipse cx="172" cy="78" rx="20" ry="12" fill="rgba(255,255,255,0.72)"/>
-                    <ellipse cx="238" cy="54" rx="16" ry="10" fill="rgba(255,255,255,0.78)"/>
-                </svg>
-            </div>
-
-            <!-- Cloud 3 - Medium Left -->
-            <div class="cloud-vector-node c3-node">
-                <svg viewBox="0 0 290 145" width="290" height="145">
-                    <defs>
-                        <radialGradient id="g3" cx="40%" cy="28%" r="60%">
-                            <stop offset="0%" stop-color="#fff6ec"/>
-                            <stop offset="50%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="var(--cloud-shadow, #d8eeff)"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="80" cy="118" rx="68" ry="22" fill="rgba(168,200,238,0.30)"/>
-                    <ellipse cx="190" cy="124" rx="95" ry="24" fill="rgba(168,200,238,0.26)"/>
-                    <ellipse cx="48" cy="108" rx="46" ry="36" fill="url(#g3)"/>
-                    <ellipse cx="105" cy="96" rx="62" ry="50" fill="url(#g3)"/>
-                    <ellipse cx="170" cy="84" rx="72" ry="60" fill="url(#g3)"/>
-                    <ellipse cx="235" cy="95" rx="60" ry="48" fill="url(#g3)"/>
-                    <ellipse cx="142" cy="64" rx="48" ry="38" fill="url(#g3)"/>
-                    <ellipse cx="195" cy="50" rx="42" ry="34" fill="#fffef4"/>
-                    <ellipse cx="150" cy="50" rx="16" ry="9" fill="rgba(255,255,255,0.70)"/>
-                </svg>
-            </div>
-
-            <!-- Cloud 4 - Medium Right -->
-            <div class="cloud-vector-node c4-node">
-                <svg viewBox="0 0 310 155" width="310" height="155">
-                    <defs>
-                        <radialGradient id="g4" cx="42%" cy="30%" r="58%">
-                            <stop offset="0%" stop-color="#fff8f0"/>
-                            <stop offset="50%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="var(--cloud-shadow, #d6edff)"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="90" cy="126" rx="76" ry="22" fill="rgba(168,200,238,0.28)"/>
-                    <ellipse cx="210" cy="132" rx="100" ry="25" fill="rgba(168,200,238,0.24)"/>
-                    <ellipse cx="55" cy="116" rx="50" ry="38" fill="url(#g4)"/>
-                    <ellipse cx="115" cy="102" rx="66" ry="54" fill="url(#g4)"/>
-                    <ellipse cx="185" cy="90" rx="76" ry="64" fill="url(#g4)"/>
-                    <ellipse cx="252" cy="104" rx="62" ry="50" fill="url(#g4)"/>
-                    <ellipse cx="155" cy="70" rx="52" ry="42" fill="url(#g4)"/>
-                    <ellipse cx="205" cy="55" rx="44" ry="36" fill="#fffef6"/>
-                    <ellipse cx="160" cy="58" rx="18" ry="10" fill="rgba(255,255,255,0.72)"/>
-                </svg>
-            </div>
-
-            <!-- Cloud 5 - Foreground Left -->
-            <div class="cloud-vector-node c5-node">
-                <svg viewBox="0 0 480 220" width="480" height="220">
-                    <defs>
-                        <radialGradient id="g5" cx="38%" cy="26%" r="58%">
-                            <stop offset="0%" stop-color="#fffbf4"/>
-                            <stop offset="35%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="var(--cloud-shadow, #cce4f8)"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="130" cy="192" rx="118" ry="32" fill="rgba(155,195,235,0.32)"/>
-                    <ellipse cx="300" cy="200" rx="155" ry="34" fill="rgba(155,195,235,0.28)"/>
-                    <ellipse cx="420" cy="194" rx="75" ry="28" fill="rgba(155,195,235,0.24)"/>
-                    <ellipse cx="75" cy="178" rx="72" ry="54" fill="url(#g5)"/>
-                    <ellipse cx="155" cy="160" rx="92" ry="72" fill="url(#g5)"/>
-                    <ellipse cx="245" cy="140" rx="108" ry="90" fill="url(#g5)"/>
-                    <ellipse cx="342" cy="155" rx="95" ry="78" fill="url(#g5)"/>
-                    <ellipse cx="415" cy="170" rx="72" ry="56" fill="url(#g5)"/>
-                    <ellipse cx="200" cy="112" rx="72" ry="58" fill="url(#g5)"/>
-                    <ellipse cx="270" cy="88" rx="85" ry="70" fill="url(#g5)"/>
-                    <ellipse cx="345" cy="110" rx="68" ry="54" fill="url(#g5)"/>
-                    <ellipse cx="268" cy="56" rx="58" ry="48" fill="#fffef6"/>
-                    <ellipse cx="208" cy="96" rx="28" ry="17" fill="rgba(255,255,255,0.80)"/>
-                    <ellipse cx="275" cy="62" rx="22" ry="14" fill="rgba(255,255,255,0.82)"/>
-                    <ellipse cx="160" cy="142" rx="24" ry="14" fill="rgba(255,255,255,0.68)"/>
-                    <ellipse cx="250" cy="196" rx="210" ry="24" fill="rgba(148,190,230,0.20)"/>
-                </svg>
-            </div>
-
-            <!-- Cloud 6 - Foreground Right -->
-            <div class="cloud-vector-node c6-node">
-                <svg viewBox="0 0 430 200" width="430" height="200">
-                    <defs>
-                        <radialGradient id="g6" cx="40%" cy="27%" r="56%">
-                            <stop offset="0%" stop-color="#fffaf2"/>
-                            <stop offset="40%" stop-color="#ffffff"/>
-                            <stop offset="100%" stop-color="var(--cloud-shadow, #cce2f8)"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="118" cy="174" rx="105" ry="30" fill="rgba(155,195,235,0.30)"/>
-                    <ellipse cx="280" cy="180" rx="140" ry="32" fill="rgba(155,195,235,0.26)"/>
-                    <ellipse cx="385" cy="175" rx="66" ry="26" fill="rgba(155,195,235,0.22)"/>
-                    <ellipse cx="68" cy="162" rx="65" ry="50" fill="url(#g6)"/>
-                    <ellipse cx="142" cy="145" rx="85" ry="68" fill="url(#g6)"/>
-                    <ellipse cx="225" cy="126" rx="98" ry="82" fill="url(#g6)"/>
-                    <ellipse cx="315" cy="140" rx="88" ry="72" fill="url(#g6)"/>
-                    <ellipse cx="385" cy="156" rx="66" ry="52" fill="url(#g6)"/>
-                    <ellipse cx="188" cy="100" rx="66" ry="54" fill="url(#g6)"/>
-                    <ellipse cx="255" cy="78" rx="78" ry="64" fill="url(#g6)"/>
-                    <ellipse cx="325" cy="100" rx="62" ry="50" fill="url(#g6)"/>
-                    <ellipse cx="254" cy="50" rx="52" ry="44" fill="#fffef8"/>
-                    <ellipse cx="195" cy="88" rx="25" ry="15" fill="rgba(255,255,255,0.78)"/>
-                    <ellipse cx="260" cy="56" rx="20" ry="12" fill="rgba(255,255,255,0.82)"/>
-                </svg>
+            <div class="as-hero__date">
+                <div class="d-day" id="heroDay">—</div>
+                <div class="d-date" id="heroDate">—</div>
+                <div class="d-time" id="heroTime">—</div>
             </div>
         </div>
-
-        <!-- Cinematic vignette (above clouds, below text) -->
-        <div class="hero-vignette"></div>
-
-        <div class="hero-text-content">
-            <span class="hero-eyebrow">Operations Dashboard</span>
-            <h2 id="greeting-txt">Initializing Environment...</h2>
-            <p id="subheading-txt" class="hero-sub">Securing enterprise operations grid databases.</p>
+        <div class="as-hero__stats">
+            <div class="as-hero__pill">
+                <span class="p-ic" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+                <span class="p-meta"><span class="p-val" id="heroStaff">0</span><span class="p-lbl">Staff</span></span>
+            </div>
+            <div class="as-hero__pill">
+                <span class="p-ic" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/></svg></span>
+                <span class="p-meta"><span class="p-val" id="heroRooms">0</span><span class="p-lbl">Rooms</span></span>
+            </div>
+            <div class="as-hero__pill">
+                <span class="p-ic" style="background:linear-gradient(135deg,#f59e0b,#ef4444);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></span>
+                <span class="p-meta"><span class="p-val" id="heroOccupied">0</span><span class="p-lbl">Occupied</span></span>
+            </div>
         </div>
     </section>
 

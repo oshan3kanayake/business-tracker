@@ -3,13 +3,36 @@
    Safe to include on every manager/staff page. No page logic touched. */
 (function () {
     // ---------------- TOAST SYSTEM ----------------
+    // Inject self-contained styles so toasts work even if app-shell.css is
+    // missing or an old cached version is loaded.
+    function ensureToastStyles() {
+        if (document.getElementById('as-toast-style')) return;
+        const st = document.createElement('style');
+        st.id = 'as-toast-style';
+        st.textContent = `
+        #as-toast-root{position:fixed;top:22px;right:22px;z-index:2147483647;display:flex;flex-direction:column;gap:12px;pointer-events:none;max-width:min(380px,calc(100vw - 44px));font-family:'Inter',system-ui,sans-serif;}
+        .as-toast{pointer-events:auto;display:flex;align-items:flex-start;gap:12px;background:#fff;color:#1a2230;border:1px solid #e6eaf1;border-left:4px solid #64708a;border-radius:12px;padding:14px 14px 14px 16px;box-shadow:0 16px 40px rgba(23,26,38,.18);font-size:.9rem;line-height:1.4;transform:translateX(120%);opacity:0;transition:transform .28s cubic-bezier(.16,1,.3,1),opacity .28s;}
+        .as-toast--in{transform:translateX(0);opacity:1;}
+        .as-toast--out{transform:translateX(120%);opacity:0;}
+        .as-toast__icon{flex-shrink:0;width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;margin-top:1px;}
+        .as-toast__icon svg{width:14px;height:14px;}
+        .as-toast__msg{flex:1 1 auto;font-weight:500;word-break:break-word;}
+        .as-toast__close{flex-shrink:0;border:none;background:none;color:#64708a;font-size:1.3rem;line-height:1;cursor:pointer;padding:0 2px;opacity:.6;}
+        .as-toast__close:hover{opacity:1;}
+        .as-toast--success{border-left-color:#16a34a;} .as-toast--success .as-toast__icon{background:#16a34a;}
+        .as-toast--error{border-left-color:#dc2626;} .as-toast--error .as-toast__icon{background:#dc2626;}
+        .as-toast--warning{border-left-color:#d97706;} .as-toast--warning .as-toast__icon{background:#d97706;}
+        .as-toast--info{border-left-color:#6366f1;} .as-toast--info .as-toast__icon{background:#6366f1;}`;
+        (document.head || document.documentElement).appendChild(st);
+    }
     function ensureToastRoot() {
+        ensureToastStyles();
         let root = document.getElementById('as-toast-root');
         if (!root) {
             root = document.createElement('div');
             root.id = 'as-toast-root';
             root.className = 'as-toast-root';
-            document.body.appendChild(root);
+            (document.body || document.documentElement).appendChild(root);
         }
         return root;
     }
@@ -54,7 +77,7 @@
     // Upgrade every existing alert() to a styled toast automatically, so all
     // pages get nice popups without changing their logic. Type is inferred
     // from the message wording (✅/success -> success, error/fail -> error).
-    const _nativeAlert = window.alert.bind(window);
+    const _nativeAlert = (typeof window.alert === 'function') ? window.alert.bind(window) : function(){};
     window.alert = function (message) {
         try {
             const msg = String(message == null ? '' : message);
@@ -103,4 +126,40 @@
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
     else boot();
+
+    // ---------------- DASHBOARD HERO (date/time + stat mirror) ----------------
+    function initHero() {
+        const day = document.getElementById('heroDay');
+        if (!day) return; // not the dashboard
+        function tick() {
+            const now = new Date();
+            const opts = { weekday: 'long' };
+            const d = document.getElementById('heroDay');
+            const dt = document.getElementById('heroDate');
+            const tm = document.getElementById('heroTime');
+            if (d) d.textContent = now.toLocaleDateString(undefined, { weekday: 'long' });
+            if (dt) dt.textContent = now.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+            if (tm) tm.textContent = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        }
+        tick(); setInterval(tick, 30000);
+
+        // Mirror the real stat cards into the hero pills whenever they change.
+        const pairs = [['staffCount','heroStaff'], ['roomCount','heroRooms'], ['occupiedRooms','heroOccupied']];
+        function mirror() {
+            pairs.forEach(([src, dst]) => {
+                const a = document.getElementById(src), b = document.getElementById(dst);
+                if (a && b) b.textContent = a.textContent;
+            });
+        }
+        mirror();
+        // observe source cards for updates
+        pairs.forEach(([src]) => {
+            const el = document.getElementById(src);
+            if (el && window.MutationObserver) new MutationObserver(mirror).observe(el, { childList: true, characterData: true, subtree: true });
+        });
+        // also re-mirror periodically as a safety net
+        setInterval(mirror, 1500);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initHero);
+    else initHero();
 })();
