@@ -2677,6 +2677,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 const batch = db.batch();
                 const bookingRef = db.collection('bookings').doc(id);
                 batch.update(bookingRef, {
+                    hotelId,
                     guestName, nic: nic || '', phone: phone || '', roomNumber,
                     checkIn, checkInTime, checkOut, checkOutTime,
                     status, paymentStatus,
