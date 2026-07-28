@@ -289,6 +289,19 @@
         byId('restaurantFormPanel').scrollIntoView({ behavior: 'smooth' });
     }
 
+    function openRequestedRestaurantSource() {
+        const orderId = new URLSearchParams(window.location.search).get('editOrder');
+        if (!orderId) return;
+        history.replaceState(null, '', window.location.pathname);
+        if (!canManage()) return;
+        const order = state.orders.find(item => item.id === orderId && item.hotelId === state.hotelId);
+        if (!order) {
+            alert('The linked restaurant payment could not be found for this hotel.');
+            return;
+        }
+        editOrder(orderId);
+    }
+
     async function saveOrder(event) {
         event.preventDefault();
         if (!canManage()) return;
@@ -458,6 +471,7 @@
             if (!canDownload()) byId('downloadReportBtn').hidden = true;
             wireEvents();
             await Promise.all([loadOrders(), loadRate()]);
+            openRequestedRestaurantSource();
             await loadReferenceSuggestions();
         } catch (error) {
             console.error(error);

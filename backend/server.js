@@ -172,6 +172,17 @@ function normaliseEmail(value) {
         .toLowerCase();
 }
 
+function formatRoleTitle(value) {
+    return normaliseText(value)
+        .split(/[-_]/)
+        .filter(Boolean)
+        .map(part =>
+            part.charAt(0).toUpperCase() +
+            part.slice(1).toLowerCase()
+        )
+        .join(" ");
+}
+
 function createSha256(value) {
     return crypto
         .createHash("sha256")
@@ -337,6 +348,37 @@ function validateStaffPayload(body) {
     };
 }
 
+function validateStaffAccountPayload(
+    body,
+    hrStaff
+) {
+    const trustedRoleTitle =
+        normaliseText(
+            hrStaff.roleTitle ||
+            hrStaff.role
+        ) ||
+        formatRoleTitle(
+            hrStaff.department
+        ) ||
+        "Staff";
+
+    return validateStaffPayload({
+        name: hrStaff.name,
+        roleTitle:
+            ALLOWED_STAFF_ROLE_TITLES.has(
+                trustedRoleTitle
+            )
+                ? trustedRoleTitle
+                : "Custom",
+        customRoleTitle:
+            trustedRoleTitle,
+        email: hrStaff.email,
+        phone: hrStaff.phone,
+        username: body.username,
+        password: body.password
+    });
+}
+
 // --------------------------------------------------
 // AUTHENTICATION MIDDLEWARE
 // --------------------------------------------------
@@ -471,7 +513,8 @@ async function reserveCredentials({
     username,
     password,
     managerUid,
-    hotelId
+    hotelId,
+    staffReference
 }) {
     const {
         usernameReference,
@@ -485,15 +528,51 @@ async function reserveCredentials({
         async transaction => {
             const [
                 usernameDocument,
-                passwordDocument
+                passwordDocument,
+                staffDocument
             ] = await Promise.all([
                 transaction.get(
                     usernameReference
                 ),
                 transaction.get(
                     passwordReference
+                ),
+                transaction.get(
+                    staffReference
                 )
             ]);
+
+            if (!staffDocument.exists) {
+                throw new HttpError(
+                    404,
+                    "The selected HR Staff record no longer exists.",
+                    "staff-not-found"
+                );
+            }
+
+            const staffData =
+                staffDocument.data() || {};
+
+            if (staffData.hotelId !== hotelId) {
+                throw new HttpError(
+                    403,
+                    "The selected HR Staff record is not assigned to your hotel.",
+                    "staff-hotel-mismatch"
+                );
+            }
+
+            if (
+                staffData.hasLoginAccount ||
+                staffData.loginUid ||
+                staffData.loginAccountStatus ===
+                    "pending"
+            ) {
+                throw new HttpError(
+                    409,
+                    "This Staff member already has a login account.",
+                    "staff-login-exists"
+                );
+            }
 
             if (usernameDocument.exists) {
                 throw new HttpError(
@@ -537,6 +616,19 @@ async function reserveCredentials({
                             .serverTimestamp()
                 }
             );
+
+            transaction.update(
+                staffReference,
+                {
+                    loginAccountStatus:
+                        "pending",
+                    loginReservedBy:
+                        managerUid,
+                    loginReservedAt:
+                        FieldValue
+                            .serverTimestamp()
+                }
+            );
         }
     );
 
@@ -548,20 +640,55 @@ async function reserveCredentials({
 
 async function removePendingReservations(
     usernameReference,
-    passwordReference
+    passwordReference,
+    staffReference,
+    managerUid
 ) {
-    const batch = db.batch();
-
-    batch.delete(
-        usernameReference
-    );
-
-    batch.delete(
-        passwordReference
-    );
-
     try {
-        await batch.commit();
+        await db.runTransaction(
+            async transaction => {
+                const staffDocument =
+                    await transaction.get(
+                        staffReference
+                    );
+
+                transaction.delete(
+                    usernameReference
+                );
+
+                transaction.delete(
+                    passwordReference
+                );
+
+                if (staffDocument.exists) {
+                    const staffData =
+                        staffDocument.data() || {};
+
+                    if (
+                        staffData
+                            .loginAccountStatus ===
+                            "pending" &&
+                        staffData.loginReservedBy ===
+                            managerUid
+                    ) {
+                        transaction.update(
+                            staffReference,
+                            {
+                                loginAccountStatus:
+                                    FieldValue
+                                        .delete(),
+                                loginReservedBy:
+                                    FieldValue
+                                        .delete(),
+                                loginReservedAt:
+                                    FieldValue
+                                        .delete()
+                            }
+                        );
+                    }
+                }
+            }
+        );
     } catch (error) {
         console.error(
             "Unable to clean credential reservations:",
@@ -654,6 +781,8 @@ app.get(
                     .get();
 
             const staffAccounts = [];
+            const linkedStaffIds =
+                new Set();
 
             snapshot.forEach(document => {
                 const data =
@@ -681,6 +810,8 @@ app.get(
                         data.username || "",
                     hotelId:
                         data.hotelId,
+                    staffId:
+                        data.staffId || "",
                     createdAt:
                         data.createdAt &&
                         typeof data.createdAt
@@ -690,6 +821,59 @@ app.get(
                                 .toDate()
                                 .toISOString()
                             : null
+                });
+
+                if (data.staffId) {
+                    linkedStaffIds.add(
+                        data.staffId
+                    );
+                }
+            });
+
+            const hrStaffSnapshot =
+                await db
+                    .collection("staff")
+                    .where(
+                        "hotelId",
+                        "==",
+                        hotelId
+                    )
+                    .get();
+
+            const hrStaff = [];
+
+            hrStaffSnapshot.forEach(document => {
+                const data =
+                    document.data() || {};
+
+                const hasLoginAccount =
+                    Boolean(
+                        data.hasLoginAccount ||
+                        data.loginUid ||
+                        linkedStaffIds.has(
+                            document.id
+                        )
+                    );
+
+                hrStaff.push({
+                    staffId:
+                        document.id,
+                    name:
+                        data.name || "",
+                    roleTitle:
+                        normaliseText(
+                            data.roleTitle ||
+                            data.role
+                        ) ||
+                        formatRoleTitle(
+                            data.department
+                        ) ||
+                        "Staff",
+                    email:
+                        data.email || "",
+                    phone:
+                        data.phone || "",
+                    hasLoginAccount
                 });
             });
 
@@ -708,11 +892,19 @@ app.get(
                 }
             );
 
+            hrStaff.sort((first, second) =>
+                String(first.name)
+                    .localeCompare(
+                        String(second.name)
+                    )
+            );
+
             response.json({
                 success: true,
                 hotelId,
                 staff:
-                    staffAccounts
+                    staffAccounts,
+                hrStaff
             });
         }
     )
@@ -738,6 +930,70 @@ app.post(
                 hotelId
             } = request.managerContext;
 
+            const staffId =
+                normaliseText(
+                    request.body &&
+                    request.body.staffId
+                );
+
+            if (!staffId) {
+                throw new HttpError(
+                    400,
+                    "Select an HR Staff member.",
+                    "staff-required"
+                );
+            }
+
+            const staffReference =
+                db
+                    .collection("staff")
+                    .doc(staffId);
+
+            const staffDocument =
+                await staffReference.get();
+
+            if (!staffDocument.exists) {
+                throw new HttpError(
+                    404,
+                    "The selected HR Staff record does not exist.",
+                    "staff-not-found"
+                );
+            }
+
+            const hrStaff =
+                staffDocument.data() || {};
+
+            if (hrStaff.hotelId !== hotelId) {
+                throw new HttpError(
+                    403,
+                    "The selected HR Staff record is not assigned to your hotel.",
+                    "staff-hotel-mismatch"
+                );
+            }
+
+            const existingLoginSnapshot =
+                await db
+                    .collection("users")
+                    .where(
+                        "staffId",
+                        "==",
+                        staffId
+                    )
+                    .limit(1)
+                    .get();
+
+            if (
+                hrStaff.hasLoginAccount ||
+                hrStaff.loginUid ||
+                !existingLoginSnapshot.empty
+            ) {
+                throw new HttpError(
+                    409,
+                    "This Staff member already has a login account.",
+                    "staff-login-exists"
+                );
+            }
+
             const {
                 name,
                 roleTitle,
@@ -745,8 +1001,9 @@ app.post(
                 phone,
                 username,
                 password
-            } = validateStaffPayload(
-                request.body || {}
+            } = validateStaffAccountPayload(
+                request.body || {},
+                hrStaff
             );
 
             const syntheticEmail =
@@ -765,7 +1022,8 @@ app.post(
                         username,
                         password,
                         managerUid,
-                        hotelId
+                        hotelId,
+                        staffReference
                     });
 
                 usernameReference =
@@ -816,7 +1074,7 @@ app.post(
                             STAFF_ROLE,
                         hotelId,
                         staffId:
-                            createdAuthUser.uid,
+                            staffId,
                         name,
                         roleTitle,
                         email,
@@ -861,6 +1119,27 @@ app.post(
                     }
                 );
 
+                writeBatch.update(
+                    staffReference,
+                    {
+                        loginUid:
+                            createdAuthUser.uid,
+                        hasLoginAccount:
+                            true,
+                        loginAccountStatus:
+                            "active",
+                        loginLinkedAt:
+                            FieldValue
+                                .serverTimestamp(),
+                        loginReservedBy:
+                            FieldValue
+                                .delete(),
+                        loginReservedAt:
+                            FieldValue
+                                .delete()
+                    }
+                );
+
                 await writeBatch.commit();
 
                 response.status(201).json({
@@ -874,8 +1153,9 @@ app.post(
                         roleTitle,
                         email,
                         phone,
-                        username,
-                        hotelId
+                            username,
+                            hotelId,
+                            staffId
                     }
                 });
             } catch (error) {
@@ -907,7 +1187,9 @@ app.post(
                 ) {
                     await removePendingReservations(
                         usernameReference,
-                        passwordReference
+                        passwordReference,
+                        staffReference,
+                        managerUid
                     );
                 }
 

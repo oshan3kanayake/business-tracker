@@ -1570,6 +1570,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         <button class="btn-secondary-small filter-btn" data-filter="checked_out_early">Early</button>
                         <button class="btn-secondary-small filter-btn" data-filter="cancelled">Cancelled</button>
                     </div>
+                    <input type="search" id="bookingSearch" placeholder="Search bookings" aria-label="Search bookings" style="padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none;">
                     <div class="ledger-header-right" style="background:transparent; padding:0; border:none; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                         <label style="font-size:0.65rem; font-weight:600; color:var(--color-sage); text-transform:uppercase; letter-spacing:0.5px;">Period</label>
                         <select id="bookingPeriodFilter" style="padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none;">
@@ -1793,6 +1794,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         let currentBookingFilter = 'all';
         let bookingFilterStart = null;
         let bookingFilterEnd = null;
+        let bookingSearchTerm = '';
+        const bookingActionsInProgress = new Set();
 
         // For tracking payment status changes
         let oldPaymentStatus = null;
@@ -1804,7 +1807,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 const doc = await db.collection('users').doc(user.uid).get();
                 if (!doc.exists) { alert('User data not found!'); await auth.signOut(); window.location.href = '/'; return; }
                 currentUserData = doc.data();
-                hotelId = user.uid;
+                hotelId = currentUserData.role === 'staff' ? currentUserData.hotelId : user.uid;
+                if (!hotelId) throw new Error('No hotel is assigned to this account.');
                 
                 // Update profile avatar with initials
                 const initialsElement = document.getElementById('avatarInitials');
@@ -1822,6 +1826,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 await loadPackages();
                 await loadRooms();
                 await loadBookings();
+                openRequestedBookingSource();
                 updateStats();
                 renderCalendar();
                 populateRoomSelects();
@@ -1930,6 +1935,15 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 filtered = filtered.filter(b => b.status === currentBookingFilter);
             }
 
+            if (bookingSearchTerm) {
+                filtered = filtered.filter(booking => [
+                    booking.guestName,
+                    booking.nic,
+                    booking.phone,
+                    booking.roomNumber
+                ].some(value => String(value || '').toLowerCase().includes(bookingSearchTerm)));
+            }
+
             // Apply date filter
             if (bookingFilterStart && bookingFilterEnd) {
                 filtered = filtered.filter(b => {
@@ -1961,8 +1975,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         <td><span class="payment-status-badge ${paymentClass}">${paymentClass.charAt(0).toUpperCase() + paymentClass.slice(1)}</span></td>
                         <td><span class="booking-status-badge ${statusClass}">${statusClass === 'checked_out_early' ? 'Early' : statusClass.charAt(0).toUpperCase() + statusClass.slice(1)}</span></td>
                         <td>
-                            <button class="strip-link-btn edit-strip-btn" onclick="openEditBookingModal('${b.id}')">✏️</button>
-                            <button class="strip-link-btn delete-strip-btn" onclick="deleteBooking('${b.id}')">🗑️</button>
+                            <button type="button" class="strip-link-btn edit-strip-btn" data-booking-action="edit" data-booking-id="${FinanceUtils.escapeHtml(b.id)}" aria-label="Edit booking">✏️</button>
+                            <button type="button" class="strip-link-btn delete-strip-btn" data-booking-action="delete" data-booking-id="${FinanceUtils.escapeHtml(b.id)}" aria-label="Delete booking">🗑️</button>
                         </td>
                     </tr>
                 `;
@@ -2069,6 +2083,88 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     rooms[roomIndex].status = newRoomStatus;
                 }
             }
+        }
+
+        function roomStatusForBookingStatus(status) {
+            if (status === 'upcoming') return 'Reserved';
+            if (status === 'active') return 'Occupied';
+            return 'Available';
+        }
+
+        function setBookingRowActionsDisabled(bookingId, disabled) {
+            document.querySelectorAll('#bookingTableBody button[data-booking-id]').forEach(button => {
+                if (button.dataset.bookingId === bookingId) button.disabled = disabled;
+            });
+        }
+
+        async function linkedBookingIncomeDocuments(bookingId) {
+            const snapshot = await db.collection('income')
+                .where('hotelId', '==', hotelId)
+                .where('bookingId', '==', bookingId)
+                .get();
+            return snapshot.docs;
+        }
+
+        async function deleteBooking(bookingId) {
+            const booking = bookings.find(item => item.id === bookingId);
+            if (!booking || booking.hotelId !== hotelId) {
+                alert('Unable to delete this booking because it does not belong to the current hotel.');
+                return;
+            }
+            if (bookingActionsInProgress.has(bookingId)) return;
+            if (!confirm(`Delete the booking for ${booking.guestName || 'this guest'}? This also removes linked income.`)) return;
+
+            bookingActionsInProgress.add(bookingId);
+            setBookingRowActionsDisabled(bookingId, true);
+            try {
+                const linkedIncome = await linkedBookingIncomeDocuments(bookingId);
+                const batch = db.batch();
+                batch.delete(db.collection('bookings').doc(bookingId));
+                const incomeDocId = FinanceUtils.bookingIncomeDocumentId(bookingId);
+                linkedIncome.forEach(document => batch.delete(document.ref));
+                if (!linkedIncome.some(document => document.id === incomeDocId)) {
+                    batch.delete(db.collection('income').doc(incomeDocId));
+                }
+
+                const room = rooms.find(item => item.roomNumber === booking.roomNumber);
+                if (room) batch.update(db.collection('rooms').doc(room.id), { status: 'Available' });
+
+                await batch.commit();
+                await Promise.all([loadBookings(), loadRooms()]);
+                alert('Booking deleted successfully.');
+            } catch (error) {
+                alert(`Unable to delete booking: ${error.message}`);
+            } finally {
+                bookingActionsInProgress.delete(bookingId);
+                setBookingRowActionsDisabled(bookingId, false);
+            }
+        }
+
+        const bookingTableBody = document.getElementById('bookingTableBody');
+        if (bookingTableBody) {
+            bookingTableBody.addEventListener('click', async event => {
+                const button = event.target.closest('button[data-booking-action]');
+                if (!button || !bookingTableBody.contains(button) || button.disabled) return;
+                const bookingId = button.dataset.bookingId;
+                const booking = bookings.find(item => item.id === bookingId);
+                if (!booking || booking.hotelId !== hotelId) {
+                    alert('Unable to access this booking because it does not belong to the current hotel.');
+                    return;
+                }
+                if (button.dataset.bookingAction === 'edit') {
+                    if (bookingActionsInProgress.has(bookingId)) return;
+                    bookingActionsInProgress.add(bookingId);
+                    setBookingRowActionsDisabled(bookingId, true);
+                    try {
+                        openEditBookingModal(bookingId);
+                    } finally {
+                        bookingActionsInProgress.delete(bookingId);
+                        setBookingRowActionsDisabled(bookingId, false);
+                    }
+                } else if (button.dataset.bookingAction === 'delete') {
+                    await deleteBooking(bookingId);
+                }
+            });
         }
 
         // --- AUTO CHECKOUT ---
@@ -2382,44 +2478,38 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
     // --- EDIT BOOKING ---
     let editBookingId = null;
 
-    function openEditModal(id) {
+    function openEditBookingModal(id) {
         const b = bookings.find(item => item.id === id);
-        if (!b) return;
-
-        editBookingId = id;
-        document.getElementById('editGuestName').value = b.guestName || '';
-        document.getElementById('editNic').value = b.nic || '';
-        document.getElementById('editPhone').value = b.phone || '';
-        document.getElementById('editGuestCount').value = b.guestCount || 1;
-        
-        populateEditRoomSelects();
-        document.getElementById('editRoomNumber').value = b.roomNumber || '';
-        
-        document.getElementById('editCheckIn').value = b.checkIn || '';
-        document.getElementById('editCheckInTime').value = b.checkInTime || '14:00';
-        document.getElementById('editCheckOut').value = b.checkOut || '';
-        document.getElementById('editCheckOutTime').value = b.checkOutTime || '11:00';
-        
-        document.getElementById('editStatus').value = b.status || 'upcoming';
-        document.getElementById('editPaymentStatus').value = b.paymentStatus || 'unpaid';
-        document.getElementById('editNotes').value = b.notes || '';
-        document.getElementById('editCurrency').value = b.currency || 'LKR';
-        document.getElementById('editBookingChannel').value = b.bookingChannel || 'Direct';
-        document.getElementById('editDiscountType').value = b.discountType || 'none';
-        document.getElementById('editDiscountValue').value = b.discountValue || 0;
-
-        const earlyDiv = document.getElementById('earlyCheckoutGroup');
-        if (b.status === 'checked_out_early') {
-            earlyDiv.style.display = 'block';
-            document.getElementById('editManualAmount').value = b.manualAmount || b.totalAmount || 0;
-        } else {
-            earlyDiv.style.display = 'none';
+        if (!b || b.hotelId !== hotelId) {
+            alert('Unable to edit this booking because it does not belong to the current hotel.');
+            return;
         }
 
-        populatePackageSelect();
-        document.getElementById('editMealPackage').value = b.mealPackage || '';
+        editBookingId = id;
+        document.getElementById('editBookingGuestName').value = b.guestName || '';
+        document.getElementById('editBookingNic').value = b.nic || '';
+        document.getElementById('editBookingPhone').value = b.phone || '';
+        document.getElementById('editBookingGuestCount').value = b.guestCount || 1;
+        
+        populateEditRoomSelects();
+        document.getElementById('editBookingRoom').value = b.roomNumber || '';
+        
+        document.getElementById('editBookingCheckIn').value = b.checkIn || '';
+        document.getElementById('editBookingCheckInTime').value = b.checkInTime || '14:00';
+        document.getElementById('editBookingCheckOut').value = b.checkOut || '';
+        document.getElementById('editBookingCheckOutTime').value = b.checkOutTime || '11:00';
+        
+        document.getElementById('editBookingStatus').value = b.status || 'upcoming';
+        document.getElementById('editBookingPaymentStatus').value = b.paymentStatus || 'pending';
+        document.getElementById('editBookingNotes').value = b.notes || '';
+        document.getElementById('editBookingCurrency').value = b.currency || 'LKR';
+        document.getElementById('editBookingChannel').value = b.bookingChannel || 'Direct';
+        document.getElementById('editBookingDiscountType').value = b.discountType || 'none';
+        document.getElementById('editBookingDiscountValue').value = b.discountValue || 0;
+        document.getElementById('editBookingManualAmount').value = b.manualAmount || b.totalAmount || 0;
 
-        calculateEditTariff();
+        populatePackageSelect();
+        document.getElementById('editBookingMeals').value = b.mealPackage || '';
 
         document.getElementById('editBookingModal').classList.add('show');
     }
@@ -2429,17 +2519,20 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         editBookingId = null;
     }
 
-    const editStatusSelect = document.getElementById('editStatus');
-    if (editStatusSelect) {
-        editStatusSelect.addEventListener('change', function() {
-            const earlyDiv = document.getElementById('earlyCheckoutGroup');
-            if (this.value === 'checked_out_early') {
-                earlyDiv.style.display = 'block';
-            } else {
-                earlyDiv.style.display = 'none';
-            }
-            calculateEditTariff();
-        });
+    function closeEditBookingModal() {
+        closeEditModal();
+    }
+
+    function openRequestedBookingSource() {
+        const bookingId = new URLSearchParams(window.location.search).get('editBooking');
+        if (!bookingId) return;
+        history.replaceState(null, '', window.location.pathname);
+        const booking = bookings.find(item => item.id === bookingId && item.hotelId === hotelId);
+        if (!booking) {
+            alert('The linked booking could not be found for this hotel.');
+            return;
+        }
+        openEditBookingModal(bookingId);
     }
 
     const editBookingForm = document.getElementById('editBookingForm');
@@ -2449,24 +2542,24 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             const id = editBookingId;
             if (!id) return;
 
-            const guestName = document.getElementById('editGuestName').value.trim();
-            const nic = document.getElementById('editNic').value.trim();
-            const phone = document.getElementById('editPhone').value.trim();
-            const guestCount = parseInt(document.getElementById('editGuestCount').value) || 1;
-            const roomNumber = document.getElementById('editRoomNumber').value;
-            const checkIn = document.getElementById('editCheckIn').value;
-            const checkInTime = document.getElementById('editCheckInTime').value || '14:00';
-            const checkOut = document.getElementById('editCheckOut').value;
-            const checkOutTime = document.getElementById('editCheckOutTime').value || '11:00';
-            const status = document.getElementById('editStatus').value;
-            const paymentStatus = document.getElementById('editPaymentStatus').value;
-            const notes = document.getElementById('editNotes').value.trim();
-            const currency = document.getElementById('editCurrency').value || 'LKR';
+            const guestName = document.getElementById('editBookingGuestName').value.trim();
+            const nic = document.getElementById('editBookingNic').value.trim();
+            const phone = document.getElementById('editBookingPhone').value.trim();
+            const guestCount = parseInt(document.getElementById('editBookingGuestCount').value) || 1;
+            const roomNumber = document.getElementById('editBookingRoom').value;
+            const checkIn = document.getElementById('editBookingCheckIn').value;
+            const checkInTime = document.getElementById('editBookingCheckInTime').value || '14:00';
+            const checkOut = document.getElementById('editBookingCheckOut').value;
+            const checkOutTime = document.getElementById('editBookingCheckOutTime').value || '11:00';
+            const status = document.getElementById('editBookingStatus').value;
+            const paymentStatus = document.getElementById('editBookingPaymentStatus').value;
+            const notes = document.getElementById('editBookingNotes').value.trim();
+            const currency = document.getElementById('editBookingCurrency').value || 'LKR';
             const bookingChannel = document.getElementById('editBookingChannel').value || 'Direct';
-            const discountType = document.getElementById('editDiscountType').value;
-            const discountValue = parseFloat(document.getElementById('editDiscountValue').value) || 0;
-            const mealPackage = document.getElementById('editMealPackage').value;
-            const manualAmount = parseFloat(document.getElementById('editManualAmount').value) || 0;
+            const discountType = document.getElementById('editBookingDiscountType').value;
+            const discountValue = parseFloat(document.getElementById('editBookingDiscountValue').value) || 0;
+            const mealPackage = document.getElementById('editBookingMeals').value;
+            const manualAmount = parseFloat(document.getElementById('editBookingManualAmount').value) || 0;
 
             if (!guestName || !roomNumber || !checkIn || !checkOut) {
                 alert('Please fill in all required fields.');
@@ -2474,7 +2567,10 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             }
 
             const oldBooking = bookings.find(b => b.id === id);
-            const oldPaymentStatus = oldBooking ? oldBooking.paymentStatus : null;
+            if (!oldBooking || oldBooking.hotelId !== hotelId) {
+                alert('Unable to edit this booking because it does not belong to the current hotel.');
+                return;
+            }
 
             const btn = document.querySelector('#editBookingModal .btn-submit') || document.getElementById('submitEditBookingBtn');
             if (btn) { btn.textContent = 'Updating...'; btn.disabled = true; }
@@ -2509,6 +2605,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     newTotalAmount = Math.max(0, baseTotal - discountAmount);
                 }
 
+                const linkedIncome = await linkedBookingIncomeDocuments(id);
                 const batch = db.batch();
                 const bookingRef = db.collection('bookings').doc(id);
                 batch.update(bookingRef, {
@@ -2546,24 +2643,24 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     // Payment status changed to non-paid — remove income record
                     batch.delete(incomeRef);
                 }
+                linkedIncome.forEach(document => {
+                    if (document.id !== incomeDocId) batch.delete(document.ref);
+                });
 
-                // Update room status based on booking status
-                await updateRoomStatusForBooking({ roomNumber, status });
-
-                // If room changed, free the old room
-                if (oldBooking && oldBooking.roomNumber !== roomNumber) {
+                // Keep room state in the same atomic write as booking and income.
+                if (oldBooking.roomNumber !== roomNumber) {
                     const oldRoom = rooms.find(r => r.roomNumber === oldBooking.roomNumber);
                     if (oldRoom) {
                         batch.update(db.collection('rooms').doc(oldRoom.id), { status: 'Available' });
-                        oldRoom.status = 'Available';
                     }
                     const newRoom = rooms.find(r => r.roomNumber === roomNumber);
                     if (newRoom) {
-                        let newRoomStatus = 'Available';
-                        if (status === 'upcoming') newRoomStatus = 'Reserved';
-                        else if (status === 'active') newRoomStatus = 'Occupied';
-                        batch.update(db.collection('rooms').doc(newRoom.id), { status: newRoomStatus });
-                        newRoom.status = newRoomStatus;
+                        batch.update(db.collection('rooms').doc(newRoom.id), { status: roomStatusForBookingStatus(status) });
+                    }
+                } else {
+                    const currentRoom = rooms.find(r => r.roomNumber === roomNumber);
+                    if (currentRoom) {
+                        batch.update(db.collection('rooms').doc(currentRoom.id), { status: roomStatusForBookingStatus(status) });
                     }
                 }
 
@@ -2603,6 +2700,14 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 renderBookings();
             });
         });
+
+        const bookingSearch = document.getElementById('bookingSearch');
+        if (bookingSearch) {
+            bookingSearch.addEventListener('input', event => {
+                bookingSearchTerm = event.target.value.trim().toLowerCase();
+                renderBookings();
+            });
+        }
 
         // --- TYPE / BED TOGGLES ---
         const roomTypeSelect = document.getElementById('roomTypeSelect');
