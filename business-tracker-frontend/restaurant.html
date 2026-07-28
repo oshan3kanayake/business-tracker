@@ -20,6 +20,7 @@
             <a href="expenses.html">Expenses</a>
             <a href="rooms.html">Rooms</a>
             <a href="bookings.html">Bookings</a>
+            <a href="checkout.html">Checkout</a>
             <a href="packages.html">Packages</a>
             <a href="restaurant.html" class="active">Restaurant</a>
             <a href="suppliers.html">Suppliers</a>
@@ -43,6 +44,11 @@
             <h2 id="formTitle">Add Restaurant Order</h2>
             <form id="restaurantForm">
                 <div class="form-grid">
+                    <div class="field wide"><label for="guestLink">Link to checked-in guest (leave as Walk-in if not a room guest)</label>
+                        <select id="guestLink">
+                            <option value="">🚶 Walk-in customer (no room)</option>
+                        </select>
+                    </div>
                     <div class="field"><label for="orderDate">Date</label><input id="orderDate" type="date" required></div>
                     <div class="field"><label for="orderNumber">Order number</label><input id="orderNumber" type="text" placeholder="Generated if blank"></div>
                     <div class="field"><label for="customerName">Customer name</label><input id="customerName" type="text" list="restaurantGuestOptions" placeholder="Guest or customer name" autocomplete="off"></div>

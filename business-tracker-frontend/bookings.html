@@ -1348,6 +1348,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             <a href="expenses.html">Expenses</a>
             <a href="rooms.html">Rooms</a>
             <a href="bookings.html" class="active">Bookings</a>
+            <a href="checkout.html">Checkout</a>
             <a href="packages.html">Packages</a>
             <a href="restaurant.html">Restaurant</a>
             <a href="suppliers.html">Suppliers</a>
@@ -2191,23 +2192,13 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         }
 
         // --- AUTO CHECKOUT ---
+        // AUTO-CHECKOUT DISABLED (by request): guests are NEVER checked out
+        // automatically when their booking time passes. A guest stays 'active'
+        // until staff manually check them out (past + paid, or checked-out-early
+        // + paid) from the Bookings or Checkout page. This function is now a
+        // no-op so existing call sites remain harmless.
         async function checkAutoCheckout() {
-            const today = new Date().toISOString().split('T')[0];
-            const activeBookings = bookings.filter(b => b.status === 'active' && b.checkOut && b.checkOut < today);
-            for (const b of activeBookings) {
-                try {
-                    await db.collection('bookings').doc(b.id).update({ status: 'past' });
-                    b.status = 'past';
-                    await updateRoomStatusForBooking(b);
-                    console.log(`✅ Auto-checked out booking ${b.id} (${b.guestName})`);
-                } catch (e) { console.error('Auto-checkout error:', e); }
-            }
-            if (activeBookings.length > 0) {
-                await loadBookings();
-                await loadRooms();
-                updateStats();
-                renderCalendar();
-            }
+            return;
         }
 
         function renderCalendar() {
@@ -2855,8 +2846,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             });
         });
 
-        // Run auto-checkout every minute
-        setInterval(checkAutoCheckout, 60000);
+        // Auto-checkout disabled by request — no interval.
     </script>
 
     <!-- --- EDIT PROFILE MODAL --- -->

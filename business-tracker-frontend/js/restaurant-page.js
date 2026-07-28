@@ -8,7 +8,8 @@
         orders: [],
         editingId: null,
         displayCurrency: 'LKR',
-        exchangeRate: null
+        exchangeRate: null,
+        activeGuests: [] // { bookingId, name, nic, roomNumber }
     };
 
     const auth = firebase.auth();
@@ -193,6 +194,25 @@
         setSuggestionOptions('restaurantRoomOptions', uniqueSuggestionEntries(rooms));
 
         const bookings = docsFor(results[1]);
+
+        // Build the "Link to guest" dropdown from active/checked-in guests.
+        // We store the doc id, so re-map with ids:
+        const bookingDocs = results[1].status === 'fulfilled' ? results[1].value.docs : [];
+        state.activeGuests = bookingDocs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(b => b.guestName && (b.status === 'active' || b.status === 'upcoming'))
+            .sort((a, b) => String(a.roomNumber || '').localeCompare(String(b.roomNumber || ''), undefined, { numeric: true }))
+            .map(b => ({ bookingId: b.id, name: b.guestName, nic: b.nic || '', roomNumber: b.roomNumber || '', status: b.status }));
+        const guestSelect = byId('guestLink');
+        if (guestSelect) {
+            const keepVal = guestSelect.value;
+            guestSelect.innerHTML = '<option value="">🚶 Walk-in customer (no room)</option>' +
+                state.activeGuests.map(g =>
+                    `<option value="${g.bookingId}">${escapeHtml(g.name)}${g.roomNumber ? ' — Room ' + escapeHtml(String(g.roomNumber)) : ''}${g.nic ? ' — NIC ' + escapeHtml(g.nic) : ''}${g.status === 'upcoming' ? ' (arriving)' : ''}</option>`
+                ).join('');
+            guestSelect.value = keepVal;
+        }
+
         const guests = bookings
             .filter(booking => booking.guestName && booking.status !== 'cancelled')
             .sort((a, b) => String(b.checkIn || '').localeCompare(String(a.checkIn || '')))
@@ -280,6 +300,7 @@
         byId('orderNumber').value = order.orderNumber || '';
         byId('customerName').value = order.customerName || '';
         byId('roomNumber').value = order.roomNumber || '';
+        if (byId('guestLink')) byId('guestLink').value = order.guestBookingId || '';
         byId('orderCurrency').value = FinanceUtils.normalizeCurrency(order.currency);
         byId('paymentStatus').value = order.paymentStatus || 'pending';
         byId('orderNotes').value = order.notes || '';
@@ -318,12 +339,16 @@
         const finalOrderId = orderRef.id;
         const oldOrder = orderId ? state.orders.find(order => order.id === orderId) : null;
         const now = firebase.firestore.FieldValue.serverTimestamp();
+        // Resolve the linked guest (if any) so the checkout page can group by NIC.
+        const linkedGuest = state.activeGuests.find(g => g.bookingId === byId('guestLink').value);
         const order = {
             hotelId: state.hotelId,
             date: byId('orderDate').value,
             orderNumber: byId('orderNumber').value.trim() || finalOrderId.slice(0, 8).toUpperCase(),
             customerName: byId('customerName').value.trim(),
             roomNumber: byId('roomNumber').value.trim(),
+            guestBookingId: linkedGuest ? linkedGuest.bookingId : '',
+            guestNic: linkedGuest ? linkedGuest.nic : '',
             items,
             totalAmount: FinanceUtils.calculateRestaurantTotal(items),
             currency: FinanceUtils.normalizeCurrency(byId('orderCurrency').value),
@@ -423,6 +448,14 @@
         on('displayCurrency', 'change', event => {
             state.displayCurrency = FinanceUtils.normalizeCurrency(event.target.value);
             renderOrders();
+        });
+        // When a checked-in guest is picked, auto-fill their name + room.
+        on('guestLink', 'change', event => {
+            const g = state.activeGuests.find(x => x.bookingId === event.target.value);
+            if (g) {
+                byId('customerName').value = g.name || '';
+                if (g.roomNumber) byId('roomNumber').value = g.roomNumber;
+            }
         });
         on('downloadReportBtn', 'click', downloadReport);
         on('logoutBtn', 'click', async () => {
