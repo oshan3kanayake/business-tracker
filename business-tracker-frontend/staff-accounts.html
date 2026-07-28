@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vance.Hub Operations | Staff Login Accounts</title>
+    <title>Staff Login Accounts | Hotel Business Tracker</title>
     <meta name="description" content="Create and manage Firebase login accounts for staff assigned to the current hotel.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -646,15 +646,79 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* Established Manager workspace sidebar/profile shell. */
+        header.manager-sidebar {
+            position: fixed; inset: 0 auto 0 0; z-index: 1000;
+            width: var(--sidebar-width); height: 100vh; padding: 28px 0;
+            overflow-y: auto; display: flex; flex-direction: column;
+            background: var(--navbar);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            box-shadow: 4px 0 24px rgba(25,34,49,0.12);
+        }
+        header.manager-sidebar nav {
+            display: flex; flex: 1 1 auto; flex-direction: column;
+            gap: 4px; width: 100%; padding: 10px 0;
+        }
+        header.manager-sidebar nav a {
+            width: 100%; padding: 12px 26px;
+            color: rgba(255,255,255,0.68);
+            border-left: 3px solid transparent; text-decoration: none;
+            font-size: 0.9rem; font-weight: 500;
+        }
+        header.manager-sidebar nav a:hover {
+            color: #fff; background: rgba(255,255,255,0.04);
+        }
+        header.manager-sidebar nav a.active {
+            color: #fff; border-left-color: var(--gold);
+            background: rgba(192,178,131,0.1);
+        }
+        .user-action-hub {
+            margin-top: auto; width: 100%; padding: 16px 26px 6px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .profile-dropdown { position: relative; }
+        .profile-btn {
+            display: flex; align-items: center; gap: 10px;
+            border: 0; background: transparent; color: #fff;
+        }
+        .profile-avatar {
+            width: 40px; height: 40px; display: grid; place-items: center;
+            border: 2px solid rgba(255,255,255,0.75); border-radius: 50%;
+            background: var(--sage); font-weight: 700;
+        }
+        .dropdown-menu {
+            position: absolute; bottom: calc(100% + 8px); left: 0;
+            min-width: 180px; display: none; overflow: hidden;
+            border: 1px solid rgba(85,115,115,0.3); border-radius: 8px;
+            background: #1a1a2e; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        .dropdown-menu.show { display: block; }
+        .dropdown-menu a {
+            display: flex; gap: 10px; padding: 12px 20px;
+            color: rgba(255,255,255,0.8); text-decoration: none;
+        }
+        .dropdown-menu a:hover {
+            color: #fff; background: rgba(85,115,115,0.15);
+        }
+        @media (max-width: 1024px) { :root { --sidebar-width: 190px; } }
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 64px; }
+            header.manager-sidebar { padding: 16px 0; }
+            header.manager-sidebar nav a {
+                padding: 12px 0; overflow: hidden; text-align: center;
+                font-size: 0;
+            }
+            header.manager-sidebar nav a::first-letter { font-size: 1rem; }
+            .user-action-hub {
+                padding: 12px 8px; display: flex; justify-content: center;
+            }
+            .dropdown-arrow { display: none; }
+        }
     </style>
 </head>
 
 <body>
-    <aside class="sidebar">
-        <a class="brand" href="manager-dashboard.html">
-            Vance.<span>Hub</span>
-        </a>
-
+    <header class="manager-sidebar">
         <nav>
             <a href="manager-dashboard.html">Dashboard</a>
             <a href="staff.html">Staff</a>
@@ -671,17 +735,19 @@
             <a href="complaints.html">Complaints</a>
         </nav>
 
-        <div class="sidebar-footer">
-            <div class="manager-summary" id="manager-summary">
-                <strong>Manager account</strong>
-                Authenticating…
+        <div class="user-action-hub">
+            <div class="profile-dropdown">
+                <button type="button" class="profile-btn" id="profile-button" aria-expanded="false">
+                    <span class="profile-avatar"><span id="avatar-initials">U</span></span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="dropdown-menu" id="profile-dropdown">
+                    <a href="manager-dashboard.html">✏️ Edit Profile</a>
+                    <a href="#" id="logout-button">🚪 Logout</a>
+                </div>
             </div>
-
-            <button type="button" class="logout-button" id="logout-button">
-                Log Out
-            </button>
         </div>
-    </aside>
+    </header>
 
     <main class="page-shell">
         <header class="page-header">
@@ -716,13 +782,21 @@
                     <form id="staff-account-form" novalidate>
                         <div class="form-grid">
                             <div class="field full-width">
+                                <label for="staff-member">Select Staff Member</label>
+                                <select id="staff-member" required>
+                                    <option value="">Select HR Staff member</option>
+                                </select>
+                                <small>Only HR Staff assigned to this hotel are shown.</small>
+                            </div>
+
+                            <div class="field full-width">
                                 <label for="staff-name">Name</label>
-                                <input type="text" id="staff-name" maxlength="100" autocomplete="name" required>
+                                <input type="text" id="staff-name" maxlength="100" autocomplete="name" readonly required>
                             </div>
 
                             <div class="field">
                                 <label for="role-title">Role</label>
-                                <select id="role-title" required>
+                                <select id="role-title" disabled required>
                                     <option value="">Select role</option>
                                     <option value="Chef">Chef</option>
                                     <option value="Front Desk">Front Desk</option>
@@ -740,17 +814,17 @@
 
                             <div class="field" id="custom-role-field" hidden>
                                 <label for="custom-role-title">Custom Role</label>
-                                <input type="text" id="custom-role-title" maxlength="60" autocomplete="off">
+                                <input type="text" id="custom-role-title" maxlength="60" autocomplete="off" readonly>
                             </div>
 
                             <div class="field">
                                 <label for="staff-email">Email</label>
-                                <input type="email" id="staff-email" maxlength="150" autocomplete="email" required>
+                                <input type="email" id="staff-email" maxlength="150" autocomplete="email" readonly required>
                             </div>
 
                             <div class="field">
                                 <label for="staff-phone">Phone Number</label>
-                                <input type="tel" id="staff-phone" maxlength="30" autocomplete="tel" required>
+                                <input type="tel" id="staff-phone" maxlength="30" autocomplete="tel" readonly required>
                             </div>
 
                             <div class="field full-width">
@@ -895,6 +969,7 @@
 
         let currentUserContext = null;
         let staffAccounts = [];
+        let hrStaffMembers = [];
         let lastCreatedCredentials = null;
 
         const localDevelopmentHosts = new Set([
@@ -909,6 +984,7 @@
                 : "";
 
         const staffAccountForm = document.getElementById("staff-account-form");
+        const staffMemberSelect = document.getElementById("staff-member");
         const staffNameInput = document.getElementById("staff-name");
         const roleTitleSelect = document.getElementById("role-title");
         const customRoleField = document.getElementById("custom-role-field");
@@ -929,8 +1005,10 @@
         const accountCount = document.getElementById("account-count");
         const refreshButton = document.getElementById("refresh-button");
         const hotelBadge = document.getElementById("hotel-badge");
-        const managerSummary = document.getElementById("manager-summary");
         const logoutButton = document.getElementById("logout-button");
+        const profileButton = document.getElementById("profile-button");
+        const profileDropdown = document.getElementById("profile-dropdown");
+        const avatarInitials = document.getElementById("avatar-initials");
 
         function setPageMessage(message, type = "error") {
             pageMessage.textContent = message;
@@ -1157,6 +1235,8 @@
                 });
 
                 staffAccounts = Array.isArray(result.staff) ? result.staff : [];
+                hrStaffMembers = Array.isArray(result.hrStaff) ? result.hrStaff : [];
+                renderHrStaffOptions();
                 renderStaffAccounts();
             } catch (error) {
                 console.error("Unable to load staff accounts:", error);
@@ -1170,6 +1250,45 @@
             } finally {
                 refreshButton.disabled = false;
             }
+        }
+
+        function renderHrStaffOptions() {
+            staffMemberSelect.textContent = "";
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = hrStaffMembers.length
+                ? "Select HR Staff member"
+                : "No HR Staff members found";
+            staffMemberSelect.appendChild(placeholder);
+
+            hrStaffMembers.forEach(member => {
+                const option = document.createElement("option");
+                option.value = member.staffId;
+                option.textContent = `${member.name || "Unnamed"} — ${member.roleTitle || "Staff"} — ${
+                    member.hasLoginAccount ? "Login created" : "No login"
+                }`;
+                option.disabled = Boolean(member.hasLoginAccount);
+                staffMemberSelect.appendChild(option);
+            });
+        }
+
+        function populateSelectedStaff() {
+            const member = hrStaffMembers.find(item =>
+                item.staffId === staffMemberSelect.value
+            );
+
+            staffNameInput.value = member ? member.name || "" : "";
+            staffEmailInput.value = member ? member.email || "" : "";
+            staffPhoneInput.value = member ? member.phone || "" : "";
+
+            const roleTitle = member ? member.roleTitle || "Staff" : "";
+            const existingOption = Array.from(roleTitleSelect.options)
+                .some(option => option.value === roleTitle);
+
+            roleTitleSelect.value = existingOption ? roleTitle : (roleTitle ? "Custom" : "");
+            customRoleInput.value = existingOption ? "" : roleTitle;
+            updateCustomRoleVisibility();
         }
 
         function updateCustomRoleVisibility() {
@@ -1211,6 +1330,7 @@
         }
 
         roleTitleSelect.addEventListener("change", updateCustomRoleVisibility);
+        staffMemberSelect.addEventListener("change", populateSelectedStaff);
 
         staffUsernameInput.addEventListener("input", () => {
             staffUsernameInput.value = normaliseUsername(staffUsernameInput.value)
@@ -1233,11 +1353,7 @@
             clearFormError();
             clearPageMessage();
 
-            const name = staffNameInput.value.trim();
-            const roleTitle = roleTitleSelect.value;
-            const customRoleTitle = customRoleInput.value.trim();
-            const email = staffEmailInput.value.trim().toLowerCase();
-            const phone = staffPhoneInput.value.trim();
+            const staffId = staffMemberSelect.value;
             const username = normaliseUsername(staffUsernameInput.value);
             const password = generatedPasswordInput.value;
 
@@ -1259,11 +1375,7 @@
                 await apiRequest("/api/staff", {
                     method: "POST",
                     body: JSON.stringify({
-                        name,
-                        roleTitle,
-                        customRoleTitle,
-                        email,
-                        phone,
+                        staffId,
                         username,
                         password
                     })
@@ -1273,6 +1385,9 @@
                 setPageMessage("Staff account created successfully.", "success");
 
                 staffAccountForm.reset();
+                staffNameInput.value = "";
+                staffEmailInput.value = "";
+                staffPhoneInput.value = "";
                 updateCustomRoleVisibility();
                 generatedPasswordInput.value = "";
 
@@ -1324,8 +1439,28 @@
 
         refreshButton.addEventListener("click", loadStaffAccounts);
 
-        logoutButton.addEventListener("click", async () => {
+        profileButton.addEventListener("click", () => {
+            const open = profileDropdown.classList.toggle("show");
+            profileButton.setAttribute("aria-expanded", String(open));
+        });
+
+        document.addEventListener("click", event => {
+            if (!profileButton.contains(event.target) && !profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove("show");
+                profileButton.setAttribute("aria-expanded", "false");
+            }
+        });
+
+        logoutButton.addEventListener("click", async event => {
+            event.preventDefault();
+
+            if (!window.confirm("Logout?")) {
+                return;
+            }
+
             try {
+                localStorage.removeItem("selectedHotelId");
+                localStorage.removeItem("selectedHotelName");
                 await auth.signOut();
             } finally {
                 window.location.replace("index.html");
@@ -1346,15 +1481,12 @@
                     currentUserContext.email ||
                     "Manager";
 
-                managerSummary.innerHTML = "";
-
-                const managerStrong = document.createElement("strong");
-                managerStrong.textContent = managerName;
-
-                const managerDetail = document.createElement("span");
-                managerDetail.textContent = `Hotel: ${currentUserContext.hotelId}`;
-
-                managerSummary.append(managerStrong, managerDetail);
+                avatarInitials.textContent = managerName
+                    .split(/\s+/)
+                    .map(part => part.charAt(0))
+                    .join("")
+                    .toUpperCase()
+                    .slice(0, 2) || "U";
 
                 const hotelName =
                     profile.businessName ||

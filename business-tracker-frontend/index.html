@@ -548,14 +548,6 @@
             document.getElementById("error-message");
 
         /*
-         * The owner uses the existing Firebase Auth account with
-         * username "owner".
-         *
-         * Do not put the owner's password inside this HTML file.
-         */
-        const FIXED_OWNER_USERNAME = "owner";
-
-        /*
          * Prevent the authentication observer from redirecting before
          * the selected role has been validated during form submission.
          */
@@ -619,32 +611,15 @@
             passwordInput.value = "";
 
             if (selectedRole === "owner") {
-                /*
-                 * The owner username is fixed, so it is not necessary
-                 * to show the username field.
-                 */
-                usernameInput.value = FIXED_OWNER_USERNAME;
-                usernameInput.required = false;
-                usernameBlock.classList.add("is-hidden");
-
+                usernameBlock.classList.remove("is-hidden");
+                usernameInput.required = true;
                 registrationFooter.classList.add("is-hidden");
 
                 loginInstructions.textContent =
-                    "Enter the owner account password below";
+                    "Enter your owner username and password";
             } else {
                 usernameBlock.classList.remove("is-hidden");
                 usernameInput.required = true;
-
-                /*
-                 * Do not leave the owner username inside the field
-                 * after switching back to manager or staff.
-                 */
-                if (
-                    normaliseUsername(usernameInput.value) ===
-                    FIXED_OWNER_USERNAME
-                ) {
-                    usernameInput.value = "";
-                }
 
                 if (selectedRole === "staff") {
                     registrationFooter.classList.add("is-hidden");
@@ -844,11 +819,9 @@
                     loginRoleSelect.value;
 
                 const username =
-                    selectedRole === "owner"
-                        ? FIXED_OWNER_USERNAME
-                        : normaliseUsername(
-                            usernameInput.value
-                        );
+                    normaliseUsername(
+                        usernameInput.value
+                    );
 
                 const password =
                     passwordInput.value;
