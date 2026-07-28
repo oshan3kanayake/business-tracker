@@ -13,7 +13,7 @@
 
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const canManage = () => state.mode === 'manager' && state.userData && state.userData.role !== 'staff';
+    const canManage = () => state.mode === 'manager' && state.userData && (state.userData.role === 'manager' || state.userData.role === 'staff');
     const canDownload = () => state.mode === 'owner' || (state.userData && state.userData.role !== 'staff');
     const byId = id => document.getElementById(id);
 
