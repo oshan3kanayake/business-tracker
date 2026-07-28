@@ -536,3 +536,44 @@ body.as-body .delete-strip-btn:hover { background: var(--as-danger-soft) !import
 
 /* staff-accounts: neutralize its old inline body padding + sidebar styles that clash */
 body.as-body.as-body { padding-left: var(--as-sb-w) !important; }
+
+/* ================= SIDEBAR CONFLICT KILLER (beats old 'nav a' rules) ================= */
+/* Old pages still carry `nav a` and `header nav a` rules from the previous
+   sidebar conversion. Those match the new .as-nav links (which live in a <nav>)
+   and cause centering + double-active. Use higher specificity to win. */
+body.as-body .as-sidebar .as-nav a,
+body.as-body aside.as-sidebar nav.as-nav a {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    gap: 12px !important;
+    padding: 11px 14px !important;
+    border-radius: 10px !important;
+    border: none !important;
+    border-left: none !important;
+    color: rgba(255,255,255,.6) !important;
+    font-size: .875rem !important;
+    font-weight: 500 !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    background: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+/* kill ALL old active decorations on the new links */
+body.as-body .as-sidebar .as-nav a::after,
+body.as-body .as-sidebar .as-nav a::before,
+body.as-body .as-sidebar .as-nav a.active::after,
+body.as-body .as-sidebar .as-nav a.active::before { display: none !important; content: none !important; }
+/* only the REAL active link (mine) is highlighted */
+body.as-body .as-sidebar .as-nav a.active {
+    background: linear-gradient(90deg, rgba(99,102,241,.28), rgba(139,92,246,.12)) !important;
+    color: #fff !important; font-weight: 600 !important;
+    border: none !important; border-left: none !important;
+}
+body.as-body .as-sidebar .as-nav a:hover { background: rgba(255,255,255,.05) !important; color: #fff !important; }
+body.as-body .as-sidebar .as-nav a svg { width: 18px !important; height: 18px !important; opacity: .85; flex-shrink: 0; }
+/* re-add my subtle accent bar ONLY on active, positioned correctly */
+body.as-body .as-sidebar .as-nav a.active { position: relative; }
+body.as-body .as-sidebar .as-nav a.active > span:first-of-type { }
