@@ -232,12 +232,14 @@ service cloud.firestore {
             : isManualIncome(request.resource.data)
         );
 
-      // DELETE: Manager or Staff of the hotel may delete income. Staff need to
-      // delete AUTO income as part of deleting its source booking/restaurant
-      // order (same batch). Editing auto income is still Manager-only above;
-      // this only covers removal alongside the source.
-      allow delete: if sameHotel(resource.data.hotelId)
-        && isManagerOrStaff();
+      // DELETE: Manager or Staff of the hotel may delete income.
+      //   * If the income doc EXISTS, it must belong to the caller's hotel.
+      //   * If it does NOT exist (resource == null), allow the no-op delete.
+      //     Editing a pending/unpaid booking issues delete(incomeRef) for an
+      //     income record that was never created; without this branch that
+      //     harmless delete is denied and fails the whole batch.
+      allow delete: if isManagerOrStaff()
+        && (resource == null || sameHotel(resource.data.hotelId));
     }
 
     // --- B03 FIX ------------------------------------------------------------
