@@ -1985,7 +1985,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         <td>${b.roomNumber || 'N/A'}</td>
                         <td>${checkInDisplay}</td>
                         <td>${checkOutDisplay}</td>
-                        <td>LKR ${Number(b.totalAmount || 0).toLocaleString()}</td>
+                        <td>${FinanceUtils.normalizeCurrency(b.currency)} ${Number(b.totalAmount || 0).toLocaleString(undefined, FinanceUtils.normalizeCurrency(b.currency) === 'USD' ? {minimumFractionDigits: 2, maximumFractionDigits: 2} : {})}</td>
                         <td><span class="payment-status-badge ${paymentClass}">${paymentClass.charAt(0).toUpperCase() + paymentClass.slice(1)}</span></td>
                         <td><span class="booking-status-badge ${statusClass}">${statusClass === 'checked_out_early' ? 'Early' : statusClass.charAt(0).toUpperCase() + statusClass.slice(1)}</span></td>
                         <td>
@@ -2060,8 +2060,17 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             if (upcomingBookingsEl) upcomingBookingsEl.textContent = upcoming;
 
             const paidBookings = bookings.filter(b => b.paymentStatus === 'paid');
-            const revenue = paidBookings.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
-            if (bookingRevenueEl) bookingRevenueEl.textContent = 'LKR ' + revenue.toLocaleString();
+            // Convert every booking to LKR before summing, so USD bookings are
+            // not added as if they were rupees. Falls back to raw amount if the
+            // rate is unavailable.
+            const revenue = paidBookings.reduce((sum, b) => {
+                const amt = Number(b.totalAmount || 0);
+                if (FinanceUtils.normalizeCurrency(b.currency) === 'USD' && bookingUsdRate) {
+                    return sum + amt * bookingUsdRate;
+                }
+                return sum + amt;
+            }, 0);
+            if (bookingRevenueEl) bookingRevenueEl.textContent = 'LKR ' + Math.round(revenue).toLocaleString();
             if (revenueCountEl) revenueCountEl.textContent = paidBookings.length + ' bookings';
         }
 
@@ -2801,16 +2810,22 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 doc.setTextColor(100, 100, 100);
                 doc.text(`Hotel: ${currentUserData?.businessName || 'N/A'}`, margin, 30);
                 doc.text(`Generated: ${new Date().toLocaleString()}`, margin, 36);
-                const totalRevenue = filtered.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+                const totalRevenue = filtered.reduce((sum, b) => {
+                    const amt = Number(b.totalAmount || 0);
+                    if (FinanceUtils.normalizeCurrency(b.currency) === 'USD' && bookingUsdRate) {
+                        return sum + amt * bookingUsdRate;
+                    }
+                    return sum + amt;
+                }, 0);
                 doc.setFontSize(11);
                 doc.setTextColor(60, 60, 60);
-                doc.text(`Total Revenue: LKR ${totalRevenue.toLocaleString()} (${filtered.length} bookings)`, margin, 46);
-                const headers = ['#', 'Guest', 'NIC', 'Phone', 'Room', 'Check-In', 'Check-Out', 'Total (LKR)', 'Payment', 'Status'];
+                doc.text(`Total Revenue: LKR ${Math.round(totalRevenue).toLocaleString()} (${filtered.length} bookings, USD converted at current rate)`, margin, 46);
+                const headers = ['#', 'Guest', 'NIC', 'Phone', 'Room', 'Check-In', 'Check-Out', 'Total', 'Payment', 'Status'];
                 const rows = filtered.map((b, i) => [
                     i + 1, b.guestName || 'N/A', b.nic || '-', b.phone || '-', b.roomNumber || 'N/A',
                     b.checkIn + (b.checkInTime ? ' ' + b.checkInTime : ''),
                     b.checkOut + (b.checkOutTime ? ' ' + b.checkOutTime : ''),
-                    Number(b.totalAmount || 0).toLocaleString(),
+                    `${FinanceUtils.normalizeCurrency(b.currency)} ${Number(b.totalAmount || 0).toLocaleString()}`,
                     b.paymentStatus || 'pending',
                     b.status || 'N/A'
                 ]);
