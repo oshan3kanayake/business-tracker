@@ -577,3 +577,67 @@ body.as-body .as-sidebar .as-nav a svg { width: 18px !important; height: 18px !i
 /* re-add my subtle accent bar ONLY on active, positioned correctly */
 body.as-body .as-sidebar .as-nav a.active { position: relative; }
 body.as-body .as-sidebar .as-nav a.active > span:first-of-type { }
+
+/* ================= UNIFORM FORM GRID (3 per row, clean, consistent) ================= */
+/* Force every add-form (vertical-input-stack) into a tidy 3-column grid so
+   all pages look identical. */
+body.as-body .vertical-input-stack {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 18px 20px !important;
+    align-items: start !important;
+}
+/* Hide the leftover in-form heading (e.g. "New Booking", "Add Room") — it
+   created the big empty cell and was white-on-white. The panel/section already
+   has a proper title above. */
+body.as-body .vertical-input-stack > h4,
+body.as-body .right-side-form-panel > form > h4 { display: none !important; }
+
+/* Each field: label above input, full cell width */
+body.as-body .vertical-input-stack .input-block-node {
+    display: flex !important; flex-direction: column-reverse !important; gap: 7px !important;
+    width: 100% !important; min-width: 0 !important;
+}
+body.as-body .vertical-input-stack .input-block-node .screenshot-input,
+body.as-body .vertical-input-stack .input-block-node input,
+body.as-body .vertical-input-stack .input-block-node select { width: 100% !important; }
+body.as-body .vertical-input-stack .bottom-descriptor-label {
+    order: -1; color: var(--as-ink-soft) !important; text-shadow: none !important;
+    font-size: .72rem !important; font-weight: 600 !important; letter-spacing: .2px !important;
+    text-transform: none !important;
+}
+
+/* Neutralize the ad-hoc inline flex wrappers in bookings (NIC/Phone, date/time
+   pairs) so they flow as normal grid cells instead of custom rows. */
+body.as-body .vertical-input-stack > div[style*="display:flex"],
+body.as-body .vertical-input-stack > div[style*="display: flex"] {
+    display: contents !important;   /* let their children become grid items */
+}
+/* the explicit two-column / date-time rows -> also flow into the grid */
+body.as-body .vertical-input-stack .two-column-row {
+    display: contents !important;
+}
+/* Notes / textarea + the total + actions span the full width */
+body.as-body .vertical-input-stack .form-actions-row,
+body.as-body .vertical-input-stack .price-breakdown,
+body.as-body .vertical-input-stack .booking-total { grid-column: 1 / -1 !important; }
+
+/* price breakdown -> clean summary card */
+body.as-body .vertical-input-stack .price-breakdown {
+    background: #f8fafc !important; border: 1px solid var(--as-border) !important;
+    border-radius: 12px !important; padding: 14px 18px !important; margin-top: 4px !important;
+    display: flex !important; flex-direction: column !important; gap: 6px !important;
+}
+body.as-body .price-breakdown .row { display: flex !important; justify-content: space-between !important; font-size: .85rem !important; color: var(--as-ink-soft) !important; }
+body.as-body .price-breakdown .row.total { border-top: 1px solid var(--as-border) !important; padding-top: 8px !important; margin-top: 4px !important; font-size: 1.05rem !important; font-weight: 800 !important; color: var(--as-ink) !important; }
+body.as-body .price-breakdown .row.total span { color: var(--as-ink) !important; }
+
+/* the actions row aligned right, on its own full-width line */
+body.as-body .vertical-input-stack .form-actions-row {
+    display: flex !important; justify-content: flex-end !important; gap: 12px !important;
+    border-top: 1px solid #eef1f6 !important; padding-top: 18px !important; margin-top: 4px !important;
+}
+
+/* Responsive: 2 cols then 1 */
+@media (max-width: 1100px) { body.as-body .vertical-input-stack { grid-template-columns: repeat(2, minmax(0,1fr)) !important; } }
+@media (max-width: 680px)  { body.as-body .vertical-input-stack { grid-template-columns: 1fr !important; } }

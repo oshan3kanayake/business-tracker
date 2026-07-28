@@ -1266,7 +1266,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css?v=4">
+    <link rel="stylesheet" href="css/app-shell.css?v=7">
 </head>
 <body class="as-body">
 
@@ -1327,7 +1327,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         >
             <div class="right-side-form-panel">
                 <form id="packageForm" class="vertical-input-stack">
-                    <h4 style="color:#fff; font-weight:600; font-size:0.9rem; margin-bottom:2px;">📦 Add Package</h4>
+                    <h4 style="color:#fff; font-weight:600; font-size:0.9rem; margin-bottom:2px;">Add Package</h4>
                     <div class="input-block-node">
                         <div class="dropdown-with-custom" id="packageNameWrapper">
                             <select id="packageNameSelect" required>
@@ -1362,8 +1362,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         <!-- PACKAGES LIST -->
         <div class="section-card">
             <div class="section-header">
-                <h4>📦 Packages</h4>
-                <button class="btn-primary-small" id="downloadPackageReportBtn" data-requires="manager">📥 Download Report</button>
+                <h4>Packages</h4>
+                <button class="btn-primary-small" id="downloadPackageReportBtn" data-requires="manager">Download Report</button>
             </div>
             <div class="section-body">
                 <div class="table-wrap">
@@ -1392,7 +1392,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
     <!-- EDIT PACKAGE MODAL -->
     <div class="modal-overlay" id="editPackageModal" data-requires="manager">
         <div class="modal">
-            <h2>✏️ Edit Package</h2>
+            <h2>Edit Package</h2>
             <form id="editPackageForm">
                 <input type="hidden" id="editPackageId">
                 <div class="form-group">
@@ -1544,8 +1544,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     <td>LKR ${Number(p.price || 0).toLocaleString()}</td>
                     <td>${p.description || '-'}</td>
                     <td>
-                        <button class="strip-link-btn edit-strip-btn" data-requires="manager" onclick="openEditPackageModal('${p.id}')">✏️</button>
-                        <button class="strip-link-btn delete-strip-btn" data-requires="manager" onclick="deletePackage('${p.id}')">🗑️</button>
+                        <button class="strip-link-btn edit-strip-btn" data-requires="manager" onclick="openEditPackageModal('${p.id}')">Edit</button>
+                        <button class="strip-link-btn delete-strip-btn" data-requires="manager" onclick="deletePackage('${p.id}')">Delete</button>
                     </td>
                 </tr>
             `).join('');
@@ -1943,6 +1943,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         }
     </script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js?v=4"></script>
+<script src="js/app-shell.js?v=7"></script>
 </body>
 </html>

@@ -1335,7 +1335,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/app-shell.css?v=4">
+    <link rel="stylesheet" href="css/app-shell.css?v=7">
 </head>
 <body class="as-body">
 
@@ -1413,7 +1413,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         <!-- CALENDAR -->
         <div class="calendar-section">
             <div class="calendar-header">
-                <h4>📅 Booking Calendar</h4>
+                <h4>Booking Calendar</h4>
                 <div class="calendar-nav">
                     <button onclick="changeMonth(-1)">‹</button>
                     <span class="month-label" id="calendarMonthLabel">June 2026</span>
@@ -1428,7 +1428,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         <div class="cinematic-environment-container">
             <div class="right-side-form-panel">
                 <form id="bookingForm" class="vertical-input-stack">
-                    <h4 style="color:#fff; font-weight:600; font-size:0.95rem; margin-bottom:3px;">📝 New Booking</h4>
+                    <h4 style="color:#fff; font-weight:600; font-size:0.95rem; margin-bottom:3px;">New Booking</h4>
                     
                     <div class="input-block-node">
                         <input type="text" id="bookingGuestName" class="screenshot-input" placeholder="Guest Full Name" required>
@@ -1557,8 +1557,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     </div>
                     
                     <div class="price-breakdown">
-                        <div class="row"><span>Room:</span><span id="pbRoom">LKR 0 × 0 nights = LKR 0</span></div>
-                        <div class="row"><span>Meals:</span><span id="pbMeals">LKR 0 × 0 guests × 0 nights = LKR 0</span></div>
+                        <div class="row"><span>Package × Nights:</span><span id="pbMeals">LKR 0 × 0 nights = LKR 0</span></div>
                         <div class="row total"><span>Total:</span><span id="pbTotal">LKR 0</span></div>
                     </div>
                     <div class="form-actions-row">
@@ -1572,7 +1571,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         <!-- BOOKINGS LIST -->
         <div class="section-card">
             <div class="section-header">
-                <h4>📋 Bookings</h4>
+                <h4>Bookings</h4>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                     <div class="filter-group">
                         <button class="btn-secondary-small filter-btn active" data-filter="all">All</button>
@@ -1595,7 +1594,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         <input type="date" id="bookingFilterStart" style="display:none; padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none; width:130px;">
                         <input type="date" id="bookingFilterEnd" style="display:none; padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none; width:130px;">
                     </div>
-                    <button class="btn-primary-small" id="downloadBookingReportBtn">📥 Report</button>
+                    <button class="btn-primary-small" id="downloadBookingReportBtn">Download Report</button>
                 </div>
             </div>
             <div class="section-body">
@@ -2001,8 +2000,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         <td><span class="payment-status-badge ${paymentClass}">${paymentClass.charAt(0).toUpperCase() + paymentClass.slice(1)}</span></td>
                         <td><span class="booking-status-badge ${statusClass}">${statusClass === 'checked_out_early' ? 'Early' : statusClass.charAt(0).toUpperCase() + statusClass.slice(1)}</span></td>
                         <td>
-                            <button type="button" class="strip-link-btn edit-strip-btn" data-booking-action="edit" data-booking-id="${FinanceUtils.escapeHtml(b.id)}" aria-label="Edit booking">✏️</button>
-                            <button type="button" class="strip-link-btn delete-strip-btn" data-booking-action="delete" data-booking-id="${FinanceUtils.escapeHtml(b.id)}" aria-label="Delete booking">🗑️</button>
+                            <button type="button" class="strip-link-btn edit-strip-btn" data-booking-action="edit" data-booking-id="${FinanceUtils.escapeHtml(b.id)}" aria-label="Edit booking">Edit</button>
+                            <button type="button" class="strip-link-btn delete-strip-btn" data-booking-action="delete" data-booking-id="${FinanceUtils.escapeHtml(b.id)}" aria-label="Delete booking">Delete</button>
                         </td>
                     </tr>
                 `;
@@ -2362,10 +2361,11 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 const diff = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
                 nights = diff > 0 ? diff : 1;
             }
-            const roomRate = room ? (room.rate || 0) : 0;
-            const roomTotal = roomRate * nights;
-            const mealTotal = mealPrice * guestCount * nights;
-            const baseTotal = roomTotal + mealTotal;
+            // NEW RULE: total = nights × package price (no room rate, no guest multiplier)
+            const roomRate = room ? (room.rate || 0) : 0; // kept for compatibility, not used in total
+            const roomTotal = 0;
+            const mealTotal = mealPrice * nights;
+            const baseTotal = mealTotal;
 
             // Discount calculation
             const discType = document.getElementById('bookingDiscountType').value;
@@ -2400,8 +2400,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             const pbRoom = document.getElementById('pbRoom');
             const pbMeals = document.getElementById('pbMeals');
             const pbTotal = document.getElementById('pbTotal');
-            if (pbRoom) pbRoom.textContent = `LKR ${roomRate.toLocaleString()} × ${nights} nights = LKR ${roomTotal.toLocaleString()}`;
-            if (pbMeals) pbMeals.textContent = `LKR ${mealPrice.toLocaleString()} × ${guestCount} guests × ${nights} nights = LKR ${mealTotal.toLocaleString()}`;
+            if (pbRoom) pbRoom.textContent = '';
+            if (pbMeals) pbMeals.textContent = `LKR ${mealPrice.toLocaleString()} × ${nights} nights = LKR ${mealTotal.toLocaleString()}`;
             if (pbTotal) {
                 if (cur === 'USD' && currencyReady) {
                     pbTotal.textContent = `USD ${grandTotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}  (from LKR ${grandTotalLkr.toLocaleString()})`;
@@ -2648,9 +2648,10 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         const selectedPackage = packages.find(p => p.name === mealPackage);
                         if (selectedPackage) mealPrice = selectedPackage.price || 0;
                     }
-                    const roomTotal = roomRate * nights;
-                    const mealTotal = mealPrice * guestCount * nights;
-                    const baseTotal = roomTotal + mealTotal;
+                    // NEW RULE: total = nights × package price (no room, no guest multiplier)
+                    const roomTotal = 0;
+                    const mealTotal = mealPrice * nights;
+                    const baseTotal = mealTotal;
 
                     let discountAmount = 0;
                     if (discountType === 'percentage') {
@@ -3059,6 +3060,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         }
     </script>
     </div><!-- /.as-main -->
-<script src="js/app-shell.js?v=4"></script>
+<script src="js/app-shell.js?v=7"></script>
 </body>
 </html>
