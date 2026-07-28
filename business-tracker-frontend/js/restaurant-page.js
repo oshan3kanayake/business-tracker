@@ -411,13 +411,21 @@
     }
 
     function wireEvents() {
-        ['statusFilter', 'currencyFilter', 'startDateFilter', 'endDateFilter'].forEach(id => byId(id).addEventListener('change', renderOrders));
-        byId('displayCurrency').addEventListener('change', event => {
+        // Some elements only exist on the manager page (form, logout, etc.).
+        // Guard every listener so the shared script does not crash on the
+        // owner (read-only) page.
+        const on = (id, evt, handler) => {
+            const el = byId(id);
+            if (el) el.addEventListener(evt, handler);
+        };
+
+        ['statusFilter', 'currencyFilter', 'startDateFilter', 'endDateFilter'].forEach(id => on(id, 'change', renderOrders));
+        on('displayCurrency', 'change', event => {
             state.displayCurrency = FinanceUtils.normalizeCurrency(event.target.value);
             renderOrders();
         });
-        byId('downloadReportBtn').addEventListener('click', downloadReport);
-        byId('logoutBtn').addEventListener('click', async () => {
+        on('downloadReportBtn', 'click', downloadReport);
+        on('logoutBtn', 'click', async () => {
             if (state.mode === 'owner') {
                 localStorage.removeItem('selectedHotelId');
                 localStorage.removeItem('selectedHotelName');
@@ -427,7 +435,7 @@
         });
 
         const tableBody = byId('restaurantTableBody');
-        tableBody.addEventListener('click', event => {
+        if (tableBody) tableBody.addEventListener('click', event => {
             const button = event.target.closest('button[data-action]');
             if (!button) return;
             if (button.dataset.action === 'edit') editOrder(button.dataset.id);

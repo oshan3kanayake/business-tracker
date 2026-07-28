@@ -4,14 +4,670 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant | Owner Workspace</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/restaurant.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <style>
+
+        /* 🎨 THE CINEMATIC GRADIENT DESIGN SYSTEM */
+        :root {
+            --bg-gradient-start: #1b2e2a;
+            --bg-gradient-end: #0f1115;
+            --card-charcoal: #14171d;
+            --emerald-light: #10b981;
+            --antique-gold: #c2a66b;
+            --text-light: #ffffff;
+            --text-muted: #8e96a3;
+            --alert-red: #ef4444;
+            --border-color: rgba(255, 255, 255, 0.04);
+            --transition-premium: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background-attachment: fixed;
+            color: var(--text-light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Montserrat', 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        /* ========================================== */
+        /* ✨ HIGH-END ENTRANCE ANIMATIONS            */
+        /* ========================================== */
+        @keyframes premiumFadeUp {
+            0% { opacity: 0; transform: translateY(30px); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .animated-element {
+            opacity: 0;
+            animation: premiumFadeUp 1.2s var(--transition-premium) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.15s; }
+        .delay-2 { animation-delay: 0.30s; }
+        .delay-3 { animation-delay: 0.45s; }
+        .delay-4 { animation-delay: 0.60s; }
+
+        /* ========================================== */
+        /* 🗺️ NAVIGATION SYSTEM STYLING               */
+        /* ========================================== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 60px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(15, 17, 21, 0.2);
+            backdrop-filter: blur(25px);
+        }
+
+        .navbar-brand {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--antique-gold);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.4s var(--transition-premium);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-light);
+        }
+
+        .nav-item.back-btn {
+            color: var(--antique-gold);
+            border: 1px solid rgba(194, 166, 107, 0.2);
+            padding: 8px 18px;
+            border-radius: 4px;
+            transition: all 0.4s var(--transition-premium);
+            background: transparent;
+        }
+
+        .nav-item.back-btn:hover {
+            background-color: var(--antique-gold);
+            color: #000000;
+            border-color: var(--antique-gold);
+        }
+
+        /* ========================================== */
+        /* 📈 MAIN WORKSPACE STRUCTURE CONTAINER       */
+        /* ========================================== */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px 100px 40px;
+        }
+
+        .hotel-header {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .hotel-header h1 {
+            font-weight: 300;
+            font-size: 2.4rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0 0 8px 0;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .hotel-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+            letter-spacing: 1.5px;
+        }
+
+        /* Clean Metrics Strip */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        .metric-card {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            padding: 25px 20px;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.4s var(--transition-premium), border-color 0.4s var(--transition-premium);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(194, 166, 107, 0.2);
+        }
+
+        .metric-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value.positive { color: var(--emerald-light); }
+        .metric-value.negative { color: var(--alert-red); }
+
+        /* --- TABLE SECTIONS --- */
+        .table-section {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            color: var(--antique-gold);
+            font-weight: 500;
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .table-filters select,
+        .table-filters input {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+            min-width: 120px;
+        }
+
+        .table-filters select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .table-filters select:focus,
+        .table-filters input:focus {
+            border-color: var(--antique-gold);
+        }
+
+        .table-filters input[type="date"] {
+            color-scheme: dark;
+            cursor: pointer;
+        }
+
+        .download-btn {
+            padding: 8px 18px;
+            background: var(--antique-gold);
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(194,166,107,0.3);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            padding: 0 25px 20px 25px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            vertical-align: middle;
+            color: var(--text-light);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .data-table .amount-positive {
+            color: var(--emerald-light);
+        }
+        .data-table .amount-negative {
+            color: var(--alert-red);
+        }
+
+        .source-badge,
+        .category-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            background: rgba(194, 166, 107, 0.12);
+            color: var(--antique-gold);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 0;
+            font-weight: 300;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 30px 0;
+            opacity: 0.6;
+        }
+
+        /* --- CHART SECTION --- */
+        .chart-section {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .chart-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            color: var(--antique-gold);
+            font-weight: 500;
+        }
+
+        .chart-body {
+            padding: 25px;
+            height: 320px;
+            position: relative;
+        }
+
+        .chart-body canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* --- PROFIT SECTION --- */
+        .profit-section {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .profit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .profit-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            color: var(--antique-gold);
+            font-weight: 500;
+        }
+
+        .profit-body {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .profit-body {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .profit-chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        .profit-chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .profit-summary {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .profit-summary .profit-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .profit-summary .profit-item:last-child {
+            border-bottom: none;
+        }
+
+        .profit-summary .profit-item .label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .profit-summary .profit-item .value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .profit-summary .profit-item .value.income { color: var(--emerald-light); }
+        .profit-summary .profit-item .value.expense { color: var(--alert-red); }
+        .profit-summary .profit-item .value.profit-positive { color: var(--emerald-light); }
+        .profit-summary .profit-item .value.profit-negative { color: var(--alert-red); }
+
+        /* Scrollbar */
+        .table-wrap::-webkit-scrollbar {
+            height: 4px;
+        }
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: var(--antique-gold);
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px 24px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+            .dashboard-container {
+                padding: 40px 20px 60px 20px;
+            }
+            .hotel-header h1 {
+                font-size: 1.6rem;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .metric-card {
+                padding: 20px;
+            }
+            .metric-value {
+                font-size: 1.3rem;
+            }
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+            .table-filters {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .table-filters select,
+            .table-filters input {
+                width: 100%;
+            }
+            .table-wrap {
+                padding: 0 15px 15px 15px;
+            }
+            .data-table {
+                font-size: 0.7rem;
+            }
+            .data-table td,
+            .data-table th {
+                padding: 8px 6px;
+            }
+            .download-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .chart-body {
+                padding: 15px;
+                height: 250px;
+            }
+            .profit-body {
+                padding: 15px;
+            }
+            .profit-chart-container {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .data-table {
+                font-size: 0.6rem;
+            }
+            .data-table td,
+            .data-table th {
+                padding: 6px 4px;
+            }
+            .chart-body {
+                height: 200px;
+            }
+            .profit-chart-container {
+                height: 180px;
+            }
+        }
+    
+/* ================= SIDEBAR OVERRIDE (added) ================= */
+:root { --sb-w: 230px; }
+.navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: var(--sb-w) !important;
+    height: 100vh !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    padding: 30px 0 !important;
+    border-bottom: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+}
+.navbar-brand {
+    padding: 0 26px 20px 26px !important;
+    text-align: left !important;
+}
+.nav-links {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 2px !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+}
+.nav-links .nav-item {
+    padding: 13px 26px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+    border-left: 3px solid transparent !important;
+}
+.nav-links .nav-item.active { border-left-color: var(--antique-gold) !important; }
+/* back / Properties button pinned to bottom */
+.nav-links .nav-item.back-btn {
+    margin-top: auto !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+    width: auto !important;
+}
+/* shift page content right */
+body { padding-left: var(--sb-w) !important; box-sizing: border-box !important; }
+
+@media (max-width: 1024px) {
+    :root { --sb-w: 190px; }
+    .navbar { padding: 24px 0 !important; flex-direction: column !important; }
+    .nav-links { justify-content: flex-start !important; flex-wrap: nowrap !important; gap: 2px !important; }
+    .nav-links .nav-item { padding: 12px 18px !important; }
+}
+@media (max-width: 768px) {
+    :root { --sb-w: 200px; }
+    .navbar { padding: 20px 0 !important; flex-direction: column !important; gap: 0 !important; }
+    .nav-links { flex-wrap: nowrap !important; justify-content: flex-start !important; gap: 2px !important; }
+    .nav-links .nav-item { font-size: 0.7rem !important; padding: 12px 16px !important; }
+    .dashboard-container { padding-left: 20px !important; padding-right: 20px !important; }
+}
+/* =============== END SIDEBAR OVERRIDE =============== */
+
+    
+        /* Restaurant (owner, read-only) specifics reusing owner theme */
+        .rest-toolbar {
+            display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+            background-color: var(--card-charcoal); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 22px 24px; margin-bottom: 24px;
+        }
+        .rest-toolbar .field { display: flex; flex-direction: column; gap: 6px; }
+        .rest-toolbar label {
+            font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-muted); font-weight: 700;
+        }
+        .rest-toolbar select, .rest-toolbar input {
+            padding: 10px 14px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
+            color: var(--text-light); outline: none; font-size: 0.85rem; min-width: 130px;
+        }
+        .rest-toolbar select option { background-color: #14171d; color: #fff; }
+        .rest-summary { display: flex; gap: 24px; margin-bottom: 20px; flex-wrap: wrap; }
+        .rest-summary span { color: var(--text-muted); font-size: 0.85rem; }
+        .rest-summary strong { color: var(--text-light); }
+        .rest-panel {
+            background-color: var(--card-charcoal); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 24px; overflow-x: auto;
+        }
+        .rest-panel h2 { font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; color: var(--antique-gold); margin: 0 0 16px 0; }
+        .rest-table { width: 100%; border-collapse: collapse; }
+        .rest-table th {
+            text-align: left; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); padding: 10px; border-bottom: 1px solid var(--border-color);
+        }
+        .rest-table td { padding: 10px; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-light); }
+        .rest-table tr:last-child td { border-bottom: none; }
+        .rest-table td.empty { color: var(--text-muted); text-align: center; padding: 24px; }
+        .rate-line { color: var(--text-muted); font-size: 0.78rem; margin-top: 6px; }
+        .btn { padding: 12px 24px; background: var(--antique-gold); color: #1a1a1a; border: none; border-radius: 6px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.72rem; cursor: pointer; transition: all .3s ease; }
+        .btn:hover { transform: translateY(-2px); }
+        .badge { padding: 3px 10px; border-radius: 12px; font-size: 0.68rem; font-weight: 700; }
+        .badge.paid { background: rgba(46,125,50,0.2); color: #6fcf7f; }
+        .badge.pending { background: rgba(255,152,0,0.2); color: #ffb74d; }
+    </style>
 </head>
 <body data-mode="owner">
-    <nav class="navbar" aria-label="Owner navigation">
+    <nav class="navbar">
         <div class="navbar-brand">Vance<span>.Hub</span></div>
         <div class="nav-links">
             <span class="nav-item" onclick="window.location.href='owner-dashboard.html'">Dashboard</span>
@@ -19,7 +675,9 @@
             <span class="nav-item" onclick="window.location.href='owner-financials.html'">Financials</span>
             <span class="nav-item" onclick="window.location.href='owner-rooms.html'">Rooms</span>
             <span class="nav-item" onclick="window.location.href='owner-packages.html'">Packages</span>
-            <span class="nav-item" onclick="window.location.href='owner-partners.html'">Partners</span>
+            <span class="nav-item" onclick="window.location.href='owner-customers.html'">Customers</span>
+            <span class="nav-item" onclick="window.location.href='owner-suppliers.html'">Suppliers</span>
+            <span class="nav-item" onclick="window.location.href='owner-reports.html'">Reports</span>
             <span class="nav-item active" onclick="window.location.href='owner-restaurant.html'">Restaurant</span>
             <span class="nav-item" onclick="window.location.href='owner-inventory.html'">Inventory</span>
             <span class="nav-item" onclick="window.location.href='owner-maintenance.html'">Maintenance</span>
@@ -27,24 +685,44 @@
             <span class="nav-item back-btn" onclick="window.location.href='owner-select-hotel.html'">Switch Hotel</span>
         </div>
     </nav>
-    <main class="page-shell">
-        <section class="page-heading animated-element delay-1"><h1>Restaurant</h1><p id="hotelName">Loading hotel…</p><p class="rate-line" id="exchangeRateLabel">Loading USD/LKR exchange rate…</p></section>
-        <section class="toolbar animated-element delay-2" aria-label="Restaurant filters">
+
+    <div class="dashboard-container">
+        <div class="hotel-header animated-element delay-1">
+            <h1 id="hotelName">Loading hotel…</h1>
+            <p class="rate-line" id="exchangeRateLabel">Loading USD/LKR exchange rate…</p>
+        </div>
+
+        <div class="rest-toolbar animated-element delay-2">
             <div class="field"><label for="statusFilter">Payment</label><select id="statusFilter"><option value="all">All</option><option value="pending">Pending</option><option value="paid">Paid</option></select></div>
             <div class="field"><label for="currencyFilter">Paid currency</label><select id="currencyFilter"><option value="all">All</option><option value="LKR">LKR</option><option value="USD">USD</option></select></div>
             <div class="field"><label for="startDateFilter">From</label><input id="startDateFilter" type="date"></div>
             <div class="field"><label for="endDateFilter">To</label><input id="endDateFilter" type="date"></div>
             <div class="field"><label for="displayCurrency">Display as</label><select id="displayCurrency"><option value="LKR">LKR</option><option value="USD">USD</option></select></div>
-            <button class="btn" id="downloadReportBtn" type="button">Download PDF</button>
-        </section>
-        <section class="panel table-panel animated-element delay-3"><h2>Orders</h2><div class="summary"><span>Records: <strong id="orderCount">0</strong></span><span>Confirmed total: <strong id="paidTotal">LKR 0</strong></span></div><table><thead><tr><th>#</th><th>Date</th><th>Order</th><th>Items</th><th>Paid currency</th><th>Amount</th><th>Payment</th><th>Created by</th><th>Access</th></tr></thead><tbody id="restaurantTableBody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody></table></section>
-    </main>
+            <button class="btn" id="downloadReportBtn" type="button">⬇ Download PDF</button>
+        </div>
+
+        <div class="rest-summary animated-element delay-3">
+            <span>Records: <strong id="orderCount">0</strong></span>
+            <span>Confirmed total: <strong id="paidTotal">LKR 0</strong></span>
+        </div>
+
+        <div class="rest-panel animated-element delay-3">
+            <h2>Restaurant Orders</h2>
+            <table class="rest-table">
+                <thead><tr><th>#</th><th>Date</th><th>Order</th><th>Items</th><th>Paid currency</th><th>Amount</th><th>Payment</th><th>Created by</th><th>Access</th></tr></thead>
+                <tbody id="restaurantTableBody"><tr><td colspan="9" class="empty">Loading…</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
         firebase.initializeApp({apiKey:"AIzaSyC1eITLVhTB6DbzSKqthVTJdfClRPqtClE",authDomain:"business-tracker-3707a.firebaseapp.com",projectId:"business-tracker-3707a",storageBucket:"business-tracker-3707a.firebasestorage.app",messagingSenderId:"650774120895",appId:"1:650774120895:web:aa8a4875600caabbf6f90a"});
     </script>
-    <script src="js/finance-utils.js"></script><script src="js/exchange-rate.js"></script><script src="js/restaurant-page.js"></script>
+    <script src="js/finance-utils.js"></script>
+    <script src="js/exchange-rate.js"></script>
+    <script src="js/restaurant-page.js"></script>
 </body>
 </html>

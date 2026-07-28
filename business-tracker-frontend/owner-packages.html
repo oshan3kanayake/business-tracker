@@ -337,8 +337,15 @@
         }
         .delete-strip-btn:hover { 
             background: var(--alert-red); 
-            color: #ffffff; 
+            color: #ffffff;
             transform: translateY(-1px);
+        }
+
+        /* Fix invisible dropdown options: the select shows light text on a dark
+           theme, but option popups default to white-on-white. Force dark. */
+        select option {
+            background-color: #14171d;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -353,7 +360,9 @@
             <span class="nav-item" onclick="window.location.href='owner-financials.html'">Financials</span>
             <span class="nav-item" onclick="window.location.href='owner-rooms.html'">Rooms</span>
             <span class="nav-item active" onclick="window.location.href='owner-packages.html'">Packages</span>
-            <span class="nav-item" onclick="window.location.href='owner-partners.html'">Partners</span>
+            <span class="nav-item" onclick="window.location.href='owner-customers.html'">Customers</span>
+            <span class="nav-item" onclick="window.location.href='owner-suppliers.html'">Suppliers</span>
+            <span class="nav-item" onclick="window.location.href='owner-reports.html'">Reports</span>
             <span class="nav-item" onclick="window.location.href='owner-restaurant.html'">Restaurant</span>
             <span class="nav-item" onclick="window.location.href='owner-inventory.html'">Inventory</span>
             <span class="nav-item" onclick="window.location.href='owner-maintenance.html'">Maintenance</span>

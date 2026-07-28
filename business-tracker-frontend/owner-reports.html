@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports | Owner Workspace</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/finance-utils.js"></script>
+    <style>
+
+        /* 🎨 THE CINEMATIC GRADIENT DESIGN SYSTEM */
+        :root {
+            --bg-gradient-start: #1b2e2a;
+            --bg-gradient-end: #0f1115;
+            --card-charcoal: #14171d;
+            --emerald-light: #10b981;
+            --antique-gold: #c2a66b;
+            --text-light: #ffffff;
+            --text-muted: #8e96a3;
+            --alert-red: #ef4444;
+            --border-color: rgba(255, 255, 255, 0.04);
+            --transition-premium: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background-attachment: fixed;
+            color: var(--text-light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Montserrat', 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        /* ========================================== */
+        /* ✨ HIGH-END ENTRANCE ANIMATIONS            */
+        /* ========================================== */
+        @keyframes premiumFadeUp {
+            0% { opacity: 0; transform: translateY(30px); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        .animated-element {
+            opacity: 0;
+            animation: premiumFadeUp 1.2s var(--transition-premium) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.15s; }
+        .delay-2 { animation-delay: 0.30s; }
+        .delay-3 { animation-delay: 0.45s; }
+        .delay-4 { animation-delay: 0.60s; }
+
+        /* ========================================== */
+        /* 🗺️ NAVIGATION SYSTEM STYLING               */
+        /* ========================================== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 60px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(15, 17, 21, 0.2);
+            backdrop-filter: blur(25px);
+        }
+
+        .navbar-brand {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: var(--antique-gold);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.4s var(--transition-premium);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-light);
+        }
+
+        .nav-item.back-btn {
+            color: var(--antique-gold);
+            border: 1px solid rgba(194, 166, 107, 0.2);
+            padding: 8px 18px;
+            border-radius: 4px;
+            transition: all 0.4s var(--transition-premium);
+            background: transparent;
+        }
+
+        .nav-item.back-btn:hover {
+            background-color: var(--antique-gold);
+            color: #000000;
+            border-color: var(--antique-gold);
+        }
+
+        /* ========================================== */
+        /* 📈 MAIN WORKSPACE STRUCTURE CONTAINER       */
+        /* ========================================== */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 40px 100px 40px;
+        }
+
+        .hotel-header {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .hotel-header h1 {
+            font-weight: 300;
+            font-size: 2.4rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin: 0 0 8px 0;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .hotel-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+            letter-spacing: 1.5px;
+        }
+
+        /* Clean Metrics Strip */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        .metric-card {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            padding: 25px 20px;
+            border-radius: 6px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.4s var(--transition-premium), border-color 0.4s var(--transition-premium);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(194, 166, 107, 0.2);
+        }
+
+        .metric-title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value.positive { color: var(--emerald-light); }
+        .metric-value.negative { color: var(--alert-red); }
+
+        /* --- TABLE SECTIONS --- */
+        .table-section {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            color: var(--antique-gold);
+            font-weight: 500;
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .table-filters select,
+        .table-filters input {
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+            min-width: 120px;
+        }
+
+        .table-filters select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .table-filters select:focus,
+        .table-filters input:focus {
+            border-color: var(--antique-gold);
+        }
+
+        .table-filters input[type="date"] {
+            color-scheme: dark;
+            cursor: pointer;
+        }
+
+        .download-btn {
+            padding: 8px 18px;
+            background: var(--antique-gold);
+            color: #000000;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(194,166,107,0.3);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            padding: 0 25px 20px 25px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            vertical-align: middle;
+            color: var(--text-light);
+        }
+
+        .data-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .data-table .amount-positive {
+            color: var(--emerald-light);
+        }
+        .data-table .amount-negative {
+            color: var(--alert-red);
+        }
+
+        .source-badge,
+        .category-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            background: rgba(194, 166, 107, 0.12);
+            color: var(--antique-gold);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 0;
+            font-weight: 300;
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            padding: 30px 0;
+            opacity: 0.6;
+        }
+
+        /* --- CHART SECTION --- */
+        .chart-section {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .chart-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            color: var(--antique-gold);
+            font-weight: 500;
+        }
+
+        .chart-body {
+            padding: 25px;
+            height: 320px;
+            position: relative;
+        }
+
+        .chart-body canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* --- PROFIT SECTION --- */
+        .profit-section {
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .profit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .profit-header h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            color: var(--antique-gold);
+            font-weight: 500;
+        }
+
+        .profit-body {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .profit-body {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .profit-chart-container {
+            height: 280px;
+            position: relative;
+        }
+
+        .profit-chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .profit-summary {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .profit-summary .profit-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .profit-summary .profit-item:last-child {
+            border-bottom: none;
+        }
+
+        .profit-summary .profit-item .label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .profit-summary .profit-item .value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .profit-summary .profit-item .value.income { color: var(--emerald-light); }
+        .profit-summary .profit-item .value.expense { color: var(--alert-red); }
+        .profit-summary .profit-item .value.profit-positive { color: var(--emerald-light); }
+        .profit-summary .profit-item .value.profit-negative { color: var(--alert-red); }
+
+        /* Scrollbar */
+        .table-wrap::-webkit-scrollbar {
+            height: 4px;
+        }
+        .table-wrap::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .table-wrap::-webkit-scrollbar-thumb {
+            background: var(--antique-gold);
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 20px 24px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 20px;
+            }
+            .dashboard-container {
+                padding: 40px 20px 60px 20px;
+            }
+            .hotel-header h1 {
+                font-size: 1.6rem;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .metric-card {
+                padding: 20px;
+            }
+            .metric-value {
+                font-size: 1.3rem;
+            }
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 20px;
+            }
+            .table-filters {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .table-filters select,
+            .table-filters input {
+                width: 100%;
+            }
+            .table-wrap {
+                padding: 0 15px 15px 15px;
+            }
+            .data-table {
+                font-size: 0.7rem;
+            }
+            .data-table td,
+            .data-table th {
+                padding: 8px 6px;
+            }
+            .download-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .chart-body {
+                padding: 15px;
+                height: 250px;
+            }
+            .profit-body {
+                padding: 15px;
+            }
+            .profit-chart-container {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .data-table {
+                font-size: 0.6rem;
+            }
+            .data-table td,
+            .data-table th {
+                padding: 6px 4px;
+            }
+            .chart-body {
+                height: 200px;
+            }
+            .profit-chart-container {
+                height: 180px;
+            }
+        }
+    
+/* ================= SIDEBAR OVERRIDE (added) ================= */
+:root { --sb-w: 230px; }
+.navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: var(--sb-w) !important;
+    height: 100vh !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    padding: 30px 0 !important;
+    border-bottom: none !important;
+    border-right: 1px solid var(--border-color) !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+}
+.navbar-brand {
+    padding: 0 26px 20px 26px !important;
+    text-align: left !important;
+}
+.nav-links {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 2px !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+}
+.nav-links .nav-item {
+    padding: 13px 26px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+    border-left: 3px solid transparent !important;
+}
+.nav-links .nav-item.active { border-left-color: var(--antique-gold) !important; }
+/* back / Properties button pinned to bottom */
+.nav-links .nav-item.back-btn {
+    margin-top: auto !important;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+    margin-bottom: 6px !important;
+    text-align: center !important;
+    width: auto !important;
+}
+/* shift page content right */
+body { padding-left: var(--sb-w) !important; box-sizing: border-box !important; }
+
+@media (max-width: 1024px) {
+    :root { --sb-w: 190px; }
+    .navbar { padding: 24px 0 !important; flex-direction: column !important; }
+    .nav-links { justify-content: flex-start !important; flex-wrap: nowrap !important; gap: 2px !important; }
+    .nav-links .nav-item { padding: 12px 18px !important; }
+}
+@media (max-width: 768px) {
+    :root { --sb-w: 200px; }
+    .navbar { padding: 20px 0 !important; flex-direction: column !important; gap: 0 !important; }
+    .nav-links { flex-wrap: nowrap !important; justify-content: flex-start !important; gap: 2px !important; }
+    .nav-links .nav-item { font-size: 0.7rem !important; padding: 12px 16px !important; }
+    .dashboard-container { padding-left: 20px !important; padding-right: 20px !important; }
+}
+/* =============== END SIDEBAR OVERRIDE =============== */
+
+    
+        /* Reports-specific */
+        .reports-toolbar {
+            display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+            background-color: var(--card-charcoal);
+            border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 22px 24px; margin-bottom: 28px;
+        }
+        .reports-toolbar .field { display: flex; flex-direction: column; gap: 6px; }
+        .reports-toolbar label {
+            font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--text-muted); font-weight: 700;
+        }
+        .reports-toolbar select, .reports-toolbar input {
+            padding: 10px 14px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
+            color: var(--text-light); outline: none; font-size: 0.85rem; min-width: 150px;
+        }
+        .reports-toolbar select option { background-color: #14171d; color: #fff; }
+        .btn-primary {
+            padding: 12px 28px; background: var(--antique-gold); color: #1a1a1a;
+            border: none; border-radius: 6px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; font-size: 0.75rem; cursor: pointer;
+            transition: all .3s ease;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(194,166,107,0.25); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .summary-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+            gap: 18px; margin-bottom: 28px;
+        }
+        .summary-card {
+            background-color: var(--card-charcoal); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .summary-card .label {
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px;
+            color: var(--text-muted); margin-bottom: 8px;
+        }
+        .summary-card .value { font-size: 1.6rem; font-weight: 700; color: var(--text-light); }
+        .summary-card .sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+        .report-section-preview {
+            background-color: var(--card-charcoal); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 24px; margin-bottom: 22px;
+        }
+        .report-section-preview h3 {
+            font-size: 0.95rem; letter-spacing: 1px; text-transform: uppercase;
+            color: var(--antique-gold); margin: 0 0 14px 0;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
+        }
+        .preview-table { width: 100%; border-collapse: collapse; }
+        .preview-table th {
+            text-align: left; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border-color);
+        }
+        .preview-table td { padding: 9px 10px; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-light); }
+        .preview-table tr:last-child td { border-bottom: none; }
+        .muted-empty { color: var(--text-muted); font-size: 0.82rem; padding: 12px 0; }
+        .rate-line { color: var(--text-muted); font-size: 0.78rem; margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Vance<span>.Hub</span></div>
+        <div class="nav-links">
+            <span class="nav-item" onclick="window.location.href='owner-dashboard.html'">Dashboard</span>
+            <span class="nav-item" onclick="window.location.href='owner-staff.html'">Staff</span>
+            <span class="nav-item" onclick="window.location.href='owner-financials.html'">Financials</span>
+            <span class="nav-item" onclick="window.location.href='owner-rooms.html'">Rooms</span>
+            <span class="nav-item" onclick="window.location.href='owner-packages.html'">Packages</span>
+            <span class="nav-item" onclick="window.location.href='owner-customers.html'">Customers</span>
+            <span class="nav-item" onclick="window.location.href='owner-suppliers.html'">Suppliers</span>
+            <span class="nav-item active" onclick="window.location.href='owner-reports.html'">Reports</span>
+            <span class="nav-item" onclick="window.location.href='owner-restaurant.html'">Restaurant</span>
+            <span class="nav-item" onclick="window.location.href='owner-inventory.html'">Inventory</span>
+            <span class="nav-item" onclick="window.location.href='owner-maintenance.html'">Maintenance</span>
+            <span class="nav-item" onclick="window.location.href='owner-complaints.html'">Complaints</span>
+            <span class="nav-item back-btn" onclick="window.location.href='owner-select-hotel.html'">Switch Hotel</span>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="hotel-header animated-element delay-1">
+            <h1 id="current-hotel-name">Loading Hotel...</h1>
+            <p id="hotel-location">📍 Loading...</p>
+            <p class="rate-line">Consolidated report — Financials, Complaints, Maintenance & Staff Attendance</p>
+        </div>
+
+        <div class="reports-toolbar animated-element delay-2">
+            <div class="field">
+                <label for="periodFilter">Date Range</label>
+                <select id="periodFilter">
+                    <option value="all" selected>All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="field" id="customStartField" style="display:none;">
+                <label for="startDate">From</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="field" id="customEndField" style="display:none;">
+                <label for="endDate">To</label>
+                <input type="date" id="endDate">
+            </div>
+            <button class="btn-primary" id="downloadReportBtn" type="button">⬇ Download Full Report (PDF)</button>
+        </div>
+
+        <div class="summary-grid animated-element delay-3">
+            <div class="summary-card"><div class="label">Total Income</div><div class="value" id="sumIncome">LKR 0</div><div class="sub" id="sumIncomeCount">0 records</div></div>
+            <div class="summary-card"><div class="label">Total Expenses</div><div class="value" id="sumExpense">LKR 0</div><div class="sub" id="sumExpenseCount">0 records</div></div>
+            <div class="summary-card"><div class="label">Net Profit</div><div class="value" id="sumNet">LKR 0</div><div class="sub">Income − Expenses</div></div>
+            <div class="summary-card"><div class="label">Complaints</div><div class="value" id="sumComplaints">0</div><div class="sub" id="sumComplaintsOpen">0 open</div></div>
+            <div class="summary-card"><div class="label">Maintenance</div><div class="value" id="sumMaintenance">0</div><div class="sub" id="sumMaintenanceCost">LKR 0 cost</div></div>
+            <div class="summary-card"><div class="label">Staff Attendance</div><div class="value" id="sumAttendance">0%</div><div class="sub" id="sumStaffCount">0 staff</div></div>
+        </div>
+
+        <div class="report-section-preview animated-element delay-4">
+            <h3>💰 Financial Summary</h3>
+            <div id="previewFinancials"><p class="muted-empty">Loading…</p></div>
+        </div>
+        <div class="report-section-preview animated-element delay-4">
+            <h3>📣 Complaints</h3>
+            <div id="previewComplaints"><p class="muted-empty">Loading…</p></div>
+        </div>
+        <div class="report-section-preview animated-element delay-4">
+            <h3>🔧 Maintenance</h3>
+            <div id="previewMaintenance"><p class="muted-empty">Loading…</p></div>
+        </div>
+        <div class="report-section-preview animated-element delay-4">
+            <h3>🧑‍💼 Staff Attendance</h3>
+            <div id="previewAttendance"><p class="muted-empty">Loading…</p></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1eITLVhTB6DbzSKqthVTJdfClRPqtClE",
+            authDomain: "business-tracker-3707a.firebaseapp.com",
+            projectId: "business-tracker-3707a",
+            storageBucket: "business-tracker-3707a.firebasestorage.app",
+            messagingSenderId: "650774120895",
+            appId: "1:650774120895:web:aa8a4875600caabbf6f90a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let hotelId = null, hotelName = '', hotelCity = '';
+        let raw = { income: [], expenses: [], complaints: [], maintenance: [], staff: [], attendance: [] };
+
+        const fmt = n => 'LKR ' + Math.round(Number(n || 0)).toLocaleString();
+        const esc = v => String(v == null ? '' : v);
+        const dateStr = ts => {
+            if (!ts) return '';
+            if (typeof ts === 'string') return ts.slice(0, 10);
+            if (ts.toDate) return ts.toDate().toISOString().slice(0, 10);
+            if (ts.seconds) return new Date(ts.seconds * 1000).toISOString().slice(0, 10);
+            try { return new Date(ts).toISOString().slice(0, 10); } catch (e) { return ''; }
+        };
+
+        // ---- date range from the current period filter ----
+        function currentRange() {
+            const period = document.getElementById('periodFilter').value;
+            const now = new Date();
+            const iso = d => d.toISOString().slice(0, 10);
+            if (period === 'all') return { start: null, end: null };
+            if (period === 'today') { const s = iso(now); return { start: s, end: s }; }
+            if (period === 'week') {
+                const s = new Date(now); s.setDate(now.getDate() - now.getDay());
+                const e = new Date(s); e.setDate(s.getDate() + 6);
+                return { start: iso(s), end: iso(e) };
+            }
+            if (period === 'month') {
+                return { start: iso(new Date(now.getFullYear(), now.getMonth(), 1)),
+                         end: iso(new Date(now.getFullYear(), now.getMonth() + 1, 0)) };
+            }
+            if (period === 'year') {
+                return { start: iso(new Date(now.getFullYear(), 0, 1)),
+                         end: iso(new Date(now.getFullYear(), 11, 31)) };
+            }
+            if (period === 'custom') {
+                return { start: document.getElementById('startDate').value || null,
+                         end: document.getElementById('endDate').value || null };
+            }
+            return { start: null, end: null };
+        }
+        function inRange(dStr, range) {
+            if (!range.start && !range.end) return true;
+            if (!dStr) return false;
+            if (range.start && dStr < range.start) return false;
+            if (range.end && dStr > range.end) return false;
+            return true;
+        }
+
+        function filtered() {
+            const r = currentRange();
+            return {
+                range: r,
+                income: raw.income.filter(i => inRange(dateStr(i.date), r)),
+                expenses: raw.expenses.filter(e => inRange(dateStr(e.date), r)),
+                complaints: raw.complaints.filter(c => inRange(dateStr(c.createdAt), r)),
+                maintenance: raw.maintenance.filter(m => inRange(dateStr(m.createdAt), r)),
+                attendance: raw.attendance.filter(a => inRange(dateStr(a.date), r)),
+                staff: raw.staff
+            };
+        }
+
+        // ---- attendance summary per staff (present/absent/leave) ----
+        function attendanceSummary(data) {
+            const byStaff = {};
+            data.staff.forEach(s => { byStaff[s.id] = { name: s.name || s.fullName || 'Unknown', present: 0, absent: 0, leave: 0, total: 0 }; });
+            data.attendance.forEach(a => {
+                const rec = byStaff[a.staffId];
+                if (!rec) return;
+                rec.total++;
+                const st = (a.status || '').toLowerCase();
+                if (st === 'present') rec.present++;
+                else if (st === 'absent') rec.absent++;
+                else if (st === 'leave' || st === 'on-leave') rec.leave++;
+            });
+            const rows = Object.values(byStaff).map(r => ({ ...r, percentage: r.total ? Math.round((r.present / r.total) * 100) : 0 }));
+            const overall = rows.length ? Math.round(rows.reduce((s, r) => s + r.percentage, 0) / rows.length) : 0;
+            return { rows, overall };
+        }
+
+        function renderPreviews() {
+            const d = filtered();
+            const totalIncome = d.income.reduce((s, i) => s + Number(i.amount || 0), 0);
+            const totalExpense = d.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+            const net = totalIncome - totalExpense;
+            const openComplaints = d.complaints.filter(c => (c.status || 'open').toLowerCase() !== 'resolved').length;
+            const maintCost = d.maintenance.reduce((s, m) => s + Number(m.cost || 0), 0);
+            const att = attendanceSummary(d);
+
+            document.getElementById('sumIncome').textContent = fmt(totalIncome);
+            document.getElementById('sumIncomeCount').textContent = d.income.length + ' records';
+            document.getElementById('sumExpense').textContent = fmt(totalExpense);
+            document.getElementById('sumExpenseCount').textContent = d.expenses.length + ' records';
+            document.getElementById('sumNet').textContent = fmt(net);
+            document.getElementById('sumComplaints').textContent = d.complaints.length;
+            document.getElementById('sumComplaintsOpen').textContent = openComplaints + ' open';
+            document.getElementById('sumMaintenance').textContent = d.maintenance.length;
+            document.getElementById('sumMaintenanceCost').textContent = fmt(maintCost) + ' cost';
+            document.getElementById('sumAttendance').textContent = att.overall + '%';
+            document.getElementById('sumStaffCount').textContent = d.staff.length + ' staff';
+
+            // Financials preview
+            document.getElementById('previewFinancials').innerHTML = `
+                <table class="preview-table"><thead><tr><th>Metric</th><th>Amount</th><th>Records</th></tr></thead>
+                <tbody>
+                    <tr><td>Total Income</td><td>${fmt(totalIncome)}</td><td>${d.income.length}</td></tr>
+                    <tr><td>Total Expenses</td><td>${fmt(totalExpense)}</td><td>${d.expenses.length}</td></tr>
+                    <tr><td><strong>Net Profit</strong></td><td><strong>${fmt(net)}</strong></td><td>—</td></tr>
+                </tbody></table>`;
+
+            // Complaints preview (first 8)
+            document.getElementById('previewComplaints').innerHTML = d.complaints.length ? `
+                <table class="preview-table"><thead><tr><th>Date</th><th>Guest</th><th>Subject</th><th>Priority</th><th>Status</th></tr></thead>
+                <tbody>${d.complaints.slice(0, 8).map(c => `<tr>
+                    <td>${esc(dateStr(c.createdAt))}</td><td>${esc(c.guestName || '-')}</td>
+                    <td>${esc(c.subject || '-')}</td><td>${esc(c.priority || '-')}</td><td>${esc(c.status || 'open')}</td></tr>`).join('')}
+                </tbody></table>${d.complaints.length > 8 ? `<p class="muted-empty">+ ${d.complaints.length - 8} more in the PDF</p>` : ''}`
+                : '<p class="muted-empty">No complaints in this period.</p>';
+
+            // Maintenance preview
+            document.getElementById('previewMaintenance').innerHTML = d.maintenance.length ? `
+                <table class="preview-table"><thead><tr><th>Date</th><th>Location</th><th>Issue</th><th>Priority</th><th>Status</th><th>Cost</th></tr></thead>
+                <tbody>${d.maintenance.slice(0, 8).map(m => `<tr>
+                    <td>${esc(dateStr(m.createdAt))}</td><td>${esc(m.location || '-')}</td><td>${esc(m.issue || '-')}</td>
+                    <td>${esc(m.priority || '-')}</td><td>${esc(m.status || '-')}</td><td>${fmt(m.cost)}</td></tr>`).join('')}
+                </tbody></table>${d.maintenance.length > 8 ? `<p class="muted-empty">+ ${d.maintenance.length - 8} more in the PDF</p>` : ''}`
+                : '<p class="muted-empty">No maintenance records in this period.</p>';
+
+            // Attendance preview
+            document.getElementById('previewAttendance').innerHTML = att.rows.length ? `
+                <table class="preview-table"><thead><tr><th>Staff</th><th>Present</th><th>Absent</th><th>Leave</th><th>Days</th><th>%</th></tr></thead>
+                <tbody>${att.rows.map(r => `<tr>
+                    <td>${esc(r.name)}</td><td>${r.present}</td><td>${r.absent}</td><td>${r.leave}</td><td>${r.total}</td><td>${r.percentage}%</td></tr>`).join('')}
+                </tbody></table>`
+                : '<p class="muted-empty">No staff/attendance records.</p>';
+        }
+
+        // ---- PDF ----
+        function periodLabel() {
+            const sel = document.getElementById('periodFilter');
+            const r = currentRange();
+            const txt = sel.options[sel.selectedIndex].text;
+            if (r.start || r.end) return `${txt} (${r.start || '…'} to ${r.end || '…'})`;
+            return txt;
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const d = filtered();
+            const att = attendanceSummary(d);
+            const totalIncome = d.income.reduce((s, i) => s + Number(i.amount || 0), 0);
+            const totalExpense = d.expenses.reduce((s, e) => s + Number(e.amount || 0), 0);
+            const net = totalIncome - totalExpense;
+            const maintCost = d.maintenance.reduce((s, m) => s + Number(m.cost || 0), 0);
+
+            // Cover header
+            doc.setFillColor(27, 46, 42); doc.rect(0, 0, 210, 32, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(20); doc.setFont(undefined, 'bold');
+            doc.text('Consolidated Business Report', 14, 15);
+            doc.setFontSize(10); doc.setFont(undefined, 'normal');
+            doc.text(`${hotelName || 'Hotel'}  •  ${hotelCity || ''}`, 14, 23);
+            doc.text(`Period: ${periodLabel()}   |   Generated: ${new Date().toLocaleString()}`, 14, 29);
+
+            // Executive summary cards
+            let y = 42;
+            doc.setTextColor(30, 30, 30); doc.setFontSize(13); doc.setFont(undefined, 'bold');
+            doc.text('Executive Summary', 14, y); y += 4;
+            doc.autoTable({
+                startY: y,
+                head: [['Metric', 'Value']],
+                body: [
+                    ['Total Income', fmt(totalIncome) + `  (${d.income.length} records)`],
+                    ['Total Expenses', fmt(totalExpense) + `  (${d.expenses.length} records)`],
+                    ['Net Profit', fmt(net)],
+                    ['Complaints', `${d.complaints.length} total, ${d.complaints.filter(c => (c.status||'open').toLowerCase() !== 'resolved').length} open`],
+                    ['Maintenance', `${d.maintenance.length} tasks, ${fmt(maintCost)} cost`],
+                    ['Staff Attendance', `${att.overall}% average across ${d.staff.length} staff`]
+                ],
+                theme: 'grid', headStyles: { fillColor: [85, 115, 115] }, styles: { fontSize: 9 }
+            });
+
+            // Financials detail
+            doc.setFontSize(12); doc.setFont(undefined, 'bold');
+            doc.text('1. Financial Detail', 14, doc.lastAutoTable.finalY + 10);
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 13,
+                head: [['Date', 'Type', 'Source / Category', 'Amount', 'Currency']],
+                body: [
+                    ...d.income.map(i => [dateStr(i.date), 'Income', i.source || '-', Number(i.amount||0).toLocaleString(), FinanceUtils.normalizeCurrency(i.currency)]),
+                    ...d.expenses.map(e => [dateStr(e.date), 'Expense', e.category || '-', Number(e.amount||0).toLocaleString(), FinanceUtils.normalizeCurrency(e.currency)])
+                ],
+                theme: 'striped', headStyles: { fillColor: [85, 115, 115] }, styles: { fontSize: 7 }
+            });
+
+            // Complaints
+            doc.addPage();
+            doc.setFontSize(12); doc.setFont(undefined, 'bold'); doc.text('2. Complaints', 14, 18);
+            doc.autoTable({
+                startY: 22,
+                head: [['Date', 'Guest', 'Room', 'Subject', 'Priority', 'Status']],
+                body: d.complaints.length ? d.complaints.map(c => [dateStr(c.createdAt), c.guestName||'-', c.roomNumber||'-', c.subject||'-', c.priority||'-', c.status||'open'])
+                    : [['—', 'No complaints in this period', '', '', '', '']],
+                theme: 'striped', headStyles: { fillColor: [85, 115, 115] }, styles: { fontSize: 7 }
+            });
+
+            // Maintenance
+            doc.setFontSize(12); doc.setFont(undefined, 'bold'); doc.text('3. Maintenance', 14, doc.lastAutoTable.finalY + 10);
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 13,
+                head: [['Date', 'Location', 'Category', 'Issue', 'Priority', 'Status', 'Cost']],
+                body: d.maintenance.length ? d.maintenance.map(m => [dateStr(m.createdAt), m.location||'-', m.category||'-', m.issue||'-', m.priority||'-', m.status||'-', Number(m.cost||0).toLocaleString()])
+                    : [['—', 'No maintenance records', '', '', '', '', '']],
+                theme: 'striped', headStyles: { fillColor: [85, 115, 115] }, styles: { fontSize: 7 }
+            });
+
+            // Attendance
+            doc.addPage();
+            doc.setFontSize(12); doc.setFont(undefined, 'bold'); doc.text('4. Staff Attendance', 14, 18);
+            doc.autoTable({
+                startY: 22,
+                head: [['Staff', 'Present', 'Absent', 'Leave', 'Days Recorded', 'Attendance %']],
+                body: att.rows.length ? att.rows.map(r => [r.name, r.present, r.absent, r.leave, r.total, r.percentage + '%'])
+                    : [['No staff/attendance records', '', '', '', '', '']],
+                theme: 'grid', headStyles: { fillColor: [85, 115, 115] }, styles: { fontSize: 8 }
+            });
+
+            const safeName = (hotelName || 'hotel').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+            doc.save(`full-report-${safeName}-${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        // ---- load data ----
+        async function loadAll() {
+            const [inc, exp, comp, maint, staff, att] = await Promise.all([
+                db.collection('income').where('hotelId', '==', hotelId).get(),
+                db.collection('expenses').where('hotelId', '==', hotelId).get(),
+                db.collection('complaints').where('hotelId', '==', hotelId).get(),
+                db.collection('maintenance').where('hotelId', '==', hotelId).get(),
+                db.collection('staff').where('hotelId', '==', hotelId).get(),
+                db.collection('attendance').where('hotelId', '==', hotelId).get()
+            ]);
+            raw.income = inc.docs.map(d => ({ id: d.id, ...d.data() }));
+            raw.expenses = exp.docs.map(d => ({ id: d.id, ...d.data() }));
+            raw.complaints = comp.docs.map(d => ({ id: d.id, ...d.data() }));
+            raw.maintenance = maint.docs.map(d => ({ id: d.id, ...d.data() }));
+            raw.staff = staff.docs.map(d => ({ id: d.id, ...d.data() }));
+            raw.attendance = att.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderPreviews();
+        }
+
+        // ---- filter UI wiring ----
+        document.getElementById('periodFilter').addEventListener('change', function () {
+            const isCustom = this.value === 'custom';
+            document.getElementById('customStartField').style.display = isCustom ? 'flex' : 'none';
+            document.getElementById('customEndField').style.display = isCustom ? 'flex' : 'none';
+            if (!isCustom) renderPreviews();
+        });
+        document.getElementById('startDate').addEventListener('change', renderPreviews);
+        document.getElementById('endDate').addEventListener('change', renderPreviews);
+        document.getElementById('downloadReportBtn').addEventListener('click', downloadPDF);
+
+        // ---- auth ----
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = '/'; return; }
+            hotelId = localStorage.getItem('selectedHotelId');
+            hotelName = localStorage.getItem('selectedHotelName');
+            if (!hotelId) { window.location.href = 'owner-select-hotel.html'; return; }
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists) { await auth.signOut(); window.location.href = '/'; return; }
+                if (userDoc.data().role !== 'owner') { window.location.href = '/manager-dashboard.html'; return; }
+                const hotelDoc = await db.collection('users').doc(hotelId).get();
+                if (hotelDoc.exists) {
+                    const data = hotelDoc.data();
+                    hotelCity = data.city || 'Location not specified';
+                    document.getElementById('current-hotel-name').textContent = hotelName || data.businessName || 'Unnamed Hotel';
+                    document.getElementById('hotel-location').textContent = '📍 ' + hotelCity;
+                }
+                await loadAll();
+            } catch (e) {
+                console.error('Reports load error:', e);
+                document.getElementById('previewFinancials').innerHTML = '<p class="muted-empty">Error loading report data: ' + esc(e.message) + '</p>';
+            }
+        });
+    </script>
+</body>
+</html>
