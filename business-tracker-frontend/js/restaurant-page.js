@@ -43,6 +43,18 @@
         return FinanceUtils.formatMoney(getDisplayAmount(amount, original), state.displayCurrency);
     }
 
+    // Menu prices are stored in LKR. When the order is paid in USD, convert the
+    // LKR total to a real USD amount (locked at order time) using the rate, so
+    // the income page shows the correct figure instead of relabeling LKR as USD.
+    // Returns { amount, ready }.
+    function convertTotalForCurrency(lkrTotal, currency) {
+        const cur = FinanceUtils.normalizeCurrency(currency);
+        if (cur !== 'USD') return { amount: lkrTotal, ready: true };
+        const rate = state.exchangeRate && state.exchangeRate.rate;
+        if (!rate) return { amount: lkrTotal, ready: false };
+        return { amount: Math.round((lkrTotal / rate) * 100) / 100, ready: true };
+    }
+
     async function loadRate() {
         const rateLabel = byId('exchangeRateLabel');
         try {
@@ -297,9 +309,18 @@
     }
 
     function updateFormTotal() {
-        const total = FinanceUtils.calculateRestaurantTotal(readItems());
+        const lkrTotal = FinanceUtils.calculateRestaurantTotal(readItems());
         const currency = byId('orderCurrency') ? byId('orderCurrency').value : 'LKR';
-        if (byId('formTotal')) byId('formTotal').textContent = FinanceUtils.formatMoney(total, currency);
+        const { amount, ready } = convertTotalForCurrency(lkrTotal, currency);
+        const el = byId('formTotal');
+        if (!el) return;
+        if (FinanceUtils.normalizeCurrency(currency) === 'USD') {
+            el.textContent = ready
+                ? `${FinanceUtils.formatMoney(amount, 'USD')}  (from ${FinanceUtils.formatMoney(lkrTotal, 'LKR')})`
+                : `${FinanceUtils.formatMoney(lkrTotal, 'LKR')} — USD rate unavailable`;
+        } else {
+            el.textContent = FinanceUtils.formatMoney(amount, 'LKR');
+        }
     }
 
     function resetForm() {
@@ -358,6 +379,13 @@
             alert('Add at least one valid item with a name, quantity, and non-negative price.');
             return;
         }
+        // Block a USD order if the exchange rate could not load, so we never
+        // store an unconverted LKR amount labeled as USD.
+        if (FinanceUtils.normalizeCurrency(byId('orderCurrency').value) === 'USD'
+            && !convertTotalForCurrency(FinanceUtils.calculateRestaurantTotal(items), 'USD').ready) {
+            alert('The USD exchange rate could not be loaded, so this USD order cannot be saved correctly. Please try again in a moment, or switch the currency to LKR.');
+            return;
+        }
 
         const orderId = state.editingId;
         const orderRef = orderId
@@ -377,7 +405,7 @@
             guestBookingId: linkedGuest ? linkedGuest.bookingId : '',
             guestNic: linkedGuest ? linkedGuest.nic : '',
             items,
-            totalAmount: FinanceUtils.calculateRestaurantTotal(items),
+            totalAmount: convertTotalForCurrency(FinanceUtils.calculateRestaurantTotal(items), byId('orderCurrency').value).amount,
             currency: FinanceUtils.normalizeCurrency(byId('orderCurrency').value),
             paymentStatus: byId('paymentStatus').value,
             notes: byId('orderNotes').value.trim(),
