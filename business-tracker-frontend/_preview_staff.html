@@ -1,0 +1,480 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>/* =====================================================================
+   APP SHELL — shared modern design system for MANAGER + STAFF pages.
+   Dark sidebar + light content, modern cards/forms/tables/modals.
+   Restyles existing markup; no logic/id/markup changes required.
+   ===================================================================== */
+
+:root {
+    --as-bg: #eef1f6;                 /* content canvas */
+    --as-sidebar: #171a26;            /* dark sidebar base */
+    --as-sidebar-2: #1e2233;          /* raised sidebar surface */
+    --as-sidebar-line: rgba(255,255,255,.07);
+    --as-ink: #1a2230;                /* primary text on light */
+    --as-ink-soft: #64708a;           /* muted text on light */
+    --as-card: #ffffff;
+    --as-border: #e6eaf1;
+    --as-accent: #6366f1;             /* modern indigo */
+    --as-accent-2: #8b5cf6;
+    --as-accent-soft: rgba(99,102,241,.12);
+    --as-success: #16a34a;
+    --as-success-soft: #dcfce7;
+    --as-warn: #d97706;
+    --as-warn-soft: #fef3c7;
+    --as-danger: #dc2626;
+    --as-danger-soft: #fee2e2;
+    --as-radius: 14px;
+    --as-radius-sm: 10px;
+    --as-shadow: 0 4px 24px rgba(23,26,38,.06);
+    --as-shadow-lg: 0 18px 50px rgba(23,26,38,.14);
+    --as-sb-w: 264px;
+    --as-font: 'Inter', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Use the modern font everywhere on redesigned pages */
+body.as-body, body.as-body * { font-family: var(--as-font) !important; }
+
+/* ---- base ---- */
+body.as-body {
+    margin: 0 !important;
+    padding: 0 0 0 var(--as-sb-w) !important;
+    background: var(--as-bg) !important;
+    color: var(--as-ink) !important;
+    font-family: var(--as-font) !important;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================ SIDEBAR ============================ */
+.as-sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: var(--as-sb-w);
+    background: linear-gradient(180deg, var(--as-sidebar) 0%, #14161f 100%);
+    border-right: 1px solid var(--as-sidebar-line);
+    display: flex; flex-direction: column;
+    z-index: 1000;
+    overflow: hidden;                 /* no visible scrollbar line */
+}
+.as-sidebar__scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0 14px;
+    scrollbar-width: none;            /* Firefox: hide scrollbar */
+}
+.as-sidebar__scroll::-webkit-scrollbar { width: 0; height: 0; display: none; } /* hide scrollbar */
+
+/* brand / hotel name — clean premium card */
+.as-brand {
+    display: flex; align-items: center; gap: 13px;
+    margin: 16px 4px 8px;
+    padding: 14px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+    border: 1px solid rgba(255,255,255,.06);
+}
+.as-brand__logo {
+    width: 46px; height: 46px; border-radius: 13px; flex-shrink: 0;
+    background: linear-gradient(140deg, var(--as-accent) 0%, var(--as-accent-2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px;
+    box-shadow: 0 8px 20px rgba(99,102,241,.45), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.as-brand__text { display: flex; flex-direction: column; gap: 3px; line-height: 1.15; min-width: 0; }
+.as-brand__name {
+    color: #f5f6fa; font-weight: 700; font-size: 1.05rem; letter-spacing: -0.3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 158px;
+}
+.as-brand__sub {
+    display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+    padding: 3px 9px 3px 8px; border-radius: 20px;
+    background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.2);
+    color: #6ee7b7; font-size: .62rem; letter-spacing: .2px; font-weight: 600; text-transform: none;
+}
+.as-brand__sub::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: #34d399; box-shadow: 0 0 6px rgba(52,211,153,.8);
+}
+
+/* thin divider under brand */
+.as-branddiv { height: 1px; margin: 6px 4px 12px; background: var(--as-sidebar-line); }
+
+/* section label */
+.as-navlabel { color: rgba(255,255,255,.34); font-size: .62rem; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 700; padding: 6px 14px 8px; }
+
+/* nav links */
+.as-nav { display: flex; flex-direction: column; gap: 3px; }
+.as-nav a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: 10px;
+    color: rgba(255,255,255,.6);
+    text-decoration: none; font-size: .875rem; font-weight: 500;
+    transition: background .18s ease, color .18s ease;
+    position: relative;
+}
+.as-nav a svg { width: 18px; height: 18px; flex-shrink: 0; opacity: .85; }
+.as-nav a:hover { background: rgba(255,255,255,.05); color: #fff; }
+.as-nav a.active {
+    background: linear-gradient(90deg, rgba(99,102,241,.22), rgba(139,92,246,.10));
+    color: #fff; font-weight: 600;
+}
+.as-nav a.active svg { opacity: 1; }
+.as-nav a.active::before {
+    content: ''; position: absolute; left: -14px; top: 8px; bottom: 8px; width: 3px;
+    background: var(--as-accent); border-radius: 0 3px 3px 0;
+}
+
+/* user card (bottom) */
+.as-userbar {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 11px;
+    margin: 8px 12px 14px; padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(255,255,255,.015));
+}
+.as-userbar__avatar {
+    width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: .95rem;
+}
+.as-userbar__meta { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; flex: 1 1 auto; }
+.as-userbar__name { color: #fff; font-size: .84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.as-userbar__role { color: rgba(255,255,255,.45); font-size: .68rem; }
+.as-userbar__actions { display: flex; gap: 4px; }
+.as-iconbtn {
+    width: 32px; height: 32px; border: none; border-radius: 9px; cursor: pointer;
+    background: rgba(255,255,255,.06); color: rgba(255,255,255,.7);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .18s, color .18s;
+}
+.as-iconbtn:hover { background: rgba(255,255,255,.14); color: #fff; }
+.as-iconbtn.danger:hover { background: var(--as-danger); color: #fff; }
+.as-iconbtn svg { width: 17px; height: 17px; }
+
+/* ============================ CONTENT ============================ */
+.as-main { padding: 34px 40px 90px; max-width: 1440px; margin: 0 auto; }
+.as-pagehead { margin-bottom: 26px; }
+.as-pagehead h1 { font-size: 1.85rem; font-weight: 800; letter-spacing: -0.6px; color: var(--as-ink); margin: 0; }
+.as-pagehead p { color: var(--as-ink-soft); font-size: .92rem; margin: 6px 0 0; }
+
+/* generic card */
+.as-card {
+    background: var(--as-card); border: 1px solid var(--as-border);
+    border-radius: var(--as-radius); box-shadow: var(--as-shadow);
+    padding: 24px; margin-bottom: 22px;
+}
+.as-card h2, .as-card h3 { color: var(--as-ink); margin: 0 0 16px; }
+
+/* ================= RESTYLE EXISTING PAGE CONTENT ================= */
+/* Hide the OLD top header entirely (replaced by sidebar) */
+body.as-body > header { display: none !important; }
+
+/* Page title row (was .utility-download-control-row) -> modern header */
+body.as-body .utility-download-control-row {
+    padding: 0 0 22px 0 !important; max-width: none !important; margin: 0 !important;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+}
+body.as-body .utility-download-control-row h2 {
+    font-size: 1.85rem !important; font-weight: 800 !important; color: var(--as-ink) !important; letter-spacing: -0.6px !important;
+}
+
+/* ---- The old "cinematic" add-form panel -> clean white card ---- */
+body.as-body .cinematic-environment-container {
+    background: var(--as-card) !important; border: 1px solid var(--as-border) !important;
+    border-radius: var(--as-radius) !important; box-shadow: var(--as-shadow) !important;
+    max-width: none !important; width: auto !important; margin: 0 0 24px 0 !important;
+    aspect-ratio: auto !important; height: auto !important; overflow: visible !important;
+}
+body.as-body .cinematic-environment-container::before,
+body.as-body .cinematic-environment-container::after { display: none !important; content: none !important; }
+body.as-body .right-side-form-panel {
+    position: relative !important; width: 100% !important; height: auto !important;
+    background: transparent !important; backdrop-filter: none !important;
+    border: none !important; padding: 26px 28px !important; display: block !important;
+}
+/* form field grid */
+body.as-body .vertical-input-stack {
+    display: grid !important; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 18px !important;
+}
+body.as-body .input-block-node { display: flex !important; flex-direction: column-reverse !important; gap: 7px !important; }
+body.as-body .two-column-row { grid-column: 1 / -1; }
+body.as-body .bottom-descriptor-label {
+    order: -1; color: var(--as-ink-soft) !important; text-shadow: none !important;
+    font-size: .72rem !important; font-weight: 600 !important; letter-spacing: .3px !important; text-transform: none !important;
+}
+/* inputs / selects */
+body.as-body .screenshot-input,
+body.as-body input[type="text"], body.as-body input[type="email"], body.as-body input[type="number"],
+body.as-body input[type="date"], body.as-body input[type="time"], body.as-body input[type="password"],
+body.as-body input[type="tel"], body.as-body input[type="search"], body.as-body select, body.as-body textarea {
+    background: #f8fafc !important; border: 1px solid var(--as-border) !important;
+    color: var(--as-ink) !important; border-radius: var(--as-radius-sm) !important;
+    padding: 11px 14px !important; font-size: .92rem !important; font-family: var(--as-font) !important;
+    transition: border-color .16s, box-shadow .16s, background .16s !important; box-shadow: none !important; width: 100%;
+}
+body.as-body .screenshot-input:focus, body.as-body input:focus, body.as-body select:focus, body.as-body textarea:focus {
+    background: #fff !important; border-color: var(--as-accent) !important;
+    box-shadow: 0 0 0 3px var(--as-accent-soft) !important; outline: none !important;
+}
+body.as-body select option { background: #fff; color: var(--as-ink); }
+body.as-body .form-actions-row, body.as-body .form-actions {
+    grid-column: 1 / -1; display: flex !important; justify-content: flex-end !important; gap: 12px !important;
+    margin-top: 6px !important; border-top: 1px solid #eef1f6 !important; padding-top: 18px !important;
+}
+
+/* ---- Buttons ---- */
+body.as-body .screenshot-btn, body.as-body .submit-btn-node, body.as-body .btn-submit,
+body.as-body .download-pdf-btn, body.as-body button[type="submit"] {
+    padding: 11px 22px !important; border-radius: var(--as-radius-sm) !important;
+    font-size: .85rem !important; font-weight: 700 !important; letter-spacing: .2px !important;
+    border: none !important; cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s;
+    text-transform: none !important;
+}
+body.as-body .submit-btn-node, body.as-body .btn-submit, body.as-body button[type="submit"],
+body.as-body .download-pdf-btn {
+    background: linear-gradient(135deg, var(--as-accent), var(--as-accent-2)) !important; color: #fff !important;
+    box-shadow: 0 8px 18px rgba(99,102,241,.28) !important;
+}
+body.as-body .submit-btn-node:hover, body.as-body .btn-submit:hover, body.as-body button[type="submit"]:hover,
+body.as-body .download-pdf-btn:hover { transform: translateY(-1px) !important; }
+body.as-body .clear-btn-node, body.as-body .btn-cancel {
+    background: #fff !important; color: var(--as-ink-soft) !important; border: 1px solid var(--as-border) !important;
+    text-shadow: none !important;
+}
+body.as-body .clear-btn-node:hover, body.as-body .btn-cancel:hover { background: #f1f5f9 !important; }
+
+/* ---- Content section wrapper ---- */
+body.as-body .dashboard-telemetry-section, body.as-body main.dashboard-telemetry-section {
+    padding: 0 !important; max-width: none !important; margin: 0 !important;
+}
+/* ledger / filter header */
+body.as-body .ledger-header {
+    background: var(--as-card) !important; border: 1px solid var(--as-border) !important;
+    border-radius: var(--as-radius) !important; padding: 18px 22px !important; box-shadow: var(--as-shadow) !important;
+    margin-bottom: 20px !important;
+}
+body.as-body .ledger-header-left h4 { color: var(--as-ink) !important; font-size: 1.15rem !important; }
+body.as-body .ledger-header-left p { color: var(--as-ink-soft) !important; }
+body.as-body .ledger-header-right { background: transparent !important; border: none !important; padding: 0 !important; }
+
+/* ---- Cards / surfaces used across pages ---- */
+body.as-body .linear-ledger-surface-container, body.as-body .glass-card, body.as-body .data-card,
+body.as-body .metric-card, body.as-body .stat-card, body.as-body .panel {
+    background: var(--as-card) !important; border: 1px solid var(--as-border) !important;
+    border-radius: var(--as-radius) !important; box-shadow: var(--as-shadow) !important;
+}
+
+/* ---- Tables ---- */
+body.as-body table { border-collapse: collapse !important; width: 100%; }
+body.as-body thead th, body.as-body table th {
+    background: #f8fafc !important; color: var(--as-ink-soft) !important;
+    font-size: .68rem !important; text-transform: uppercase !important; letter-spacing: .6px !important;
+    font-weight: 700 !important; padding: 13px 16px !important; border-bottom: 1px solid var(--as-border) !important; text-align: left;
+}
+body.as-body tbody td, body.as-body table td {
+    padding: 13px 16px !important; font-size: .86rem !important; color: var(--as-ink) !important;
+    border-bottom: 1px solid #f1f4f9 !important;
+}
+body.as-body tbody tr:hover td { background: #fafbff !important; }
+
+/* ---- Tabs ---- */
+body.as-body .staff-tab-btn, body.as-body .tab-btn {
+    background: transparent !important; border: none !important; color: var(--as-ink-soft) !important;
+    padding: 10px 18px !important; font-weight: 600 !important; border-radius: 9px !important; cursor: pointer;
+}
+body.as-body .staff-tab-btn.active, body.as-body .tab-btn.active {
+    background: var(--as-accent-soft) !important; color: var(--as-accent) !important;
+}
+
+/* ---- Modals ---- */
+body.as-body .modal-overlay { background: rgba(15,18,28,.55) !important; backdrop-filter: blur(6px) !important; }
+body.as-body .modal {
+    background: var(--as-card) !important; border: 1px solid var(--as-border) !important;
+    border-radius: var(--as-radius) !important; box-shadow: var(--as-shadow-lg) !important; color: var(--as-ink) !important;
+    padding: 30px !important;
+}
+body.as-body .modal h2, body.as-body .modal h3 { color: var(--as-ink) !important; }
+body.as-body .modal .form-group label, body.as-body .modal label { color: var(--as-ink-soft) !important; }
+
+/* ---- Badges (status) generic ---- */
+body.as-body .status-badge, body.as-body .badge {
+    border-radius: 20px !important; font-weight: 700 !important; font-size: .7rem !important; padding: 4px 12px !important;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+    :root { --as-sb-w: 76px; }
+    .as-brand__text, .as-brand__sub, .as-navlabel, .as-nav a span,
+    .as-userbar__meta { display: none !important; }
+    .as-brand { justify-content: center; padding: 20px 0; }
+    .as-nav a { justify-content: center; padding: 12px 0; }
+    .as-userbar { justify-content: center; padding: 14px 0; }
+    body.as-body { padding-left: var(--as-sb-w) !important; }
+    body.as-body .as-main { padding: 24px 18px 80px; }
+}
+
+/* ================= FILTER / DOWNLOAD ROW (clean + modern) ================= */
+body.as-body .ledger-header {
+    display: flex !important; justify-content: space-between !important; align-items: center !important;
+    flex-wrap: wrap !important; gap: 18px !important;
+    padding: 20px 24px !important;
+}
+body.as-body .ledger-header-left h4 { font-size: 1.15rem !important; font-weight: 700 !important; letter-spacing: -0.3px !important; }
+body.as-body .ledger-header-left p { font-size: .84rem !important; margin-top: 3px !important; }
+
+/* the right side: label + selects + dates + download, neatly aligned */
+body.as-body .ledger-header-right {
+    display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 10px !important;
+}
+body.as-body .ledger-header-right label {
+    font-size: .7rem !important; text-transform: uppercase !important; letter-spacing: .6px !important;
+    font-weight: 700 !important; color: var(--as-ink-soft) !important; margin-right: 2px !important;
+}
+body.as-body .ledger-header-right select,
+body.as-body .ledger-header-right input[type="date"] {
+    height: 40px !important; padding: 0 14px !important; width: auto !important; min-width: 130px !important;
+    background: #f8fafc !important; border: 1px solid var(--as-border) !important; border-radius: 10px !important;
+    color: var(--as-ink) !important; font-size: .85rem !important; font-weight: 500 !important;
+    cursor: pointer; transition: border-color .16s, box-shadow .16s, background .16s;
+}
+body.as-body .ledger-header-right select:hover,
+body.as-body .ledger-header-right input[type="date"]:hover { border-color: #cdd5e3 !important; }
+body.as-body .ledger-header-right select:focus,
+body.as-body .ledger-header-right input[type="date"]:focus {
+    background: #fff !important; border-color: var(--as-accent) !important; box-shadow: 0 0 0 3px var(--as-accent-soft) !important; outline: none !important;
+}
+
+/* Download PDF button — pill with icon */
+body.as-body .download-pdf-btn {
+    display: inline-flex !important; align-items: center !important; gap: 8px !important;
+    height: 40px !important; padding: 0 20px !important;
+    background: linear-gradient(135deg, var(--as-accent), var(--as-accent-2)) !important; color: #fff !important;
+    border: none !important; border-radius: 10px !important; font-size: .82rem !important; font-weight: 700 !important;
+    cursor: pointer; box-shadow: 0 8px 18px rgba(99,102,241,.28) !important;
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease !important;
+}
+body.as-body .download-pdf-btn svg { width: 16px !important; height: 16px !important; }
+body.as-body .download-pdf-btn:hover { transform: translateY(-1px) !important; filter: brightness(1.06); box-shadow: 0 12px 24px rgba(99,102,241,.35) !important; }
+body.as-body .download-pdf-btn:active { transform: translateY(0) !important; }
+
+/* ================= INTERACTIVITY / POLISH ================= */
+/* cards lift slightly on hover for a lively feel */
+body.as-body .cinematic-environment-container,
+body.as-body .linear-ledger-surface-container,
+body.as-body .metric-card, body.as-body .stat-card, body.as-body .panel {
+    transition: box-shadow .22s ease, transform .22s ease, border-color .22s ease !important;
+}
+body.as-body .metric-card:hover, body.as-body .stat-card:hover {
+    transform: translateY(-3px) !important; box-shadow: var(--as-shadow-lg) !important; border-color: #d9e0ec !important;
+}
+/* nav + userbar micro-interactions already in place; add a subtle scale on icon buttons */
+.as-iconbtn:active { transform: scale(.92); }
+/* tab hover */
+body.as-body .staff-tab-btn, body.as-body .tab-btn { transition: background .16s, color .16s !important; }
+body.as-body .staff-tab-btn:hover, body.as-body .tab-btn:hover { background: #f1f5f9 !important; color: var(--as-ink) !important; }
+/* table row action buttons / links get pointer + hover */
+body.as-body .strip-link-btn, body.as-body .edit-strip-btn, body.as-body .delete-strip-btn,
+body.as-body button:not(:disabled) { transition: transform .12s ease, background .16s ease, color .16s ease; }
+body.as-body .strip-link-btn:hover { transform: translateY(-1px); }
+/* inputs feel responsive */
+body.as-body input, body.as-body select, body.as-body textarea { transition: border-color .16s, box-shadow .16s, background .16s !important; }
+
+/* page title row spacing when it holds filters too */
+body.as-body .utility-download-control-row { align-items: flex-start; }
+
+/* ================= TOAST / POPUP NOTIFICATIONS ================= */
+.as-toast-root {
+    position: fixed; top: 22px; right: 22px; z-index: 99999;
+    display: flex; flex-direction: column; gap: 12px; pointer-events: none;
+    max-width: min(380px, calc(100vw - 44px));
+}
+.as-toast {
+    pointer-events: auto;
+    display: flex; align-items: flex-start; gap: 12px;
+    background: #fff; color: var(--as-ink);
+    border: 1px solid var(--as-border); border-left: 4px solid var(--as-ink-soft);
+    border-radius: 12px; padding: 14px 14px 14px 16px;
+    box-shadow: 0 16px 40px rgba(23,26,38,.16);
+    font-family: var(--as-font); font-size: .88rem; line-height: 1.4;
+    transform: translateX(120%); opacity: 0; transition: transform .28s cubic-bezier(.16,1,.3,1), opacity .28s;
+}
+.as-toast--in { transform: translateX(0); opacity: 1; }
+.as-toast--out { transform: translateX(120%); opacity: 0; }
+.as-toast__icon { flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #fff; margin-top: 1px; }
+.as-toast__icon svg { width: 14px; height: 14px; }
+.as-toast__msg { flex: 1 1 auto; font-weight: 500; color: var(--as-ink); word-break: break-word; }
+.as-toast__close { flex-shrink: 0; border: none; background: none; color: var(--as-ink-soft); font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 2px; opacity: .6; }
+.as-toast__close:hover { opacity: 1; }
+.as-toast--success { border-left-color: var(--as-success); }
+.as-toast--success .as-toast__icon { background: var(--as-success); }
+.as-toast--error { border-left-color: var(--as-danger); }
+.as-toast--error .as-toast__icon { background: var(--as-danger); }
+.as-toast--warning { border-left-color: var(--as-warn); }
+.as-toast--warning .as-toast__icon { background: var(--as-warn); }
+.as-toast--info { border-left-color: var(--as-accent); }
+.as-toast--info .as-toast__icon { background: var(--as-accent); }
+</style></head>
+<body class="as-body">
+<aside class="as-sidebar">
+        <div class="as-sidebar__scroll">
+            <div class="as-brand">
+                <div class="as-brand__logo" id="asHotelInitial">H</div>
+                <div class="as-brand__text">
+                    <span class="as-brand__name" id="asHotelName">Hotel</span>
+                    <span class="as-brand__sub">Online</span>
+                </div>
+            </div>
+            <div class="as-branddiv"></div>
+            <div class="as-navlabel">Workspace</div>
+            <nav class="as-nav">
+                <a href="manager-dashboard.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span>Dashboard</span></a>
+                <a href="staff.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg><span>Staff</span></a>
+                <a href="staff-accounts.html" data-requires="manager"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-1.5-1.5"/></svg><span>Staff Accounts</span></a>
+                <a href="income.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span>Income</span></a>
+                <a href="expenses.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg><span>Expenses</span></a>
+                <a href="rooms.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v0"/></svg><span>Rooms</span></a>
+                <a href="bookings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Bookings</span></a>
+                <a href="checkout.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Checkout</span></a>
+                <a href="packages.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg><span>Packages</span></a>
+                <a href="restaurant.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M5 2v20"/><path d="M17 2v20"/><path d="M21 8c0-3-2-6-4-6v9c2 0 4-1 4-3z"/></svg><span>Restaurant</span></a>
+                <a href="suppliers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><span>Suppliers</span></a>
+                <a href="inventory.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4v10l8 4 8-4V7z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/></svg><span>Inventory</span></a>
+                <a href="maintenance.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Maintenance</span></a>
+                <a href="complaints.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Complaints</span></a>
+            </nav>
+        </div>
+        <div class="as-userbar">
+            <div class="as-userbar__avatar" id="avatarInitials">U</div>
+            <div class="as-userbar__meta">
+                <span class="as-userbar__name" id="asUserName">User</span>
+                <span class="as-userbar__role" id="asUserRole">Manager</span>
+            </div>
+            <div class="as-userbar__actions">
+                <button class="as-iconbtn" type="button" title="Edit Profile" onclick="openEditProfileModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="as-iconbtn danger" type="button" id="logoutBtn" title="Logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+            </div>
+        </div>
+    </aside>
+<div class="as-main">
+  <div class="utility-download-control-row"><h2>Personnel Ledger</h2></div>
+  <div class="cinematic-environment-container"><div class="right-side-form-panel">
+    <form class="vertical-input-stack">
+      <div class="input-block-node"><input class="screenshot-input" placeholder="Full Name"><span class="bottom-descriptor-label">Full Name</span></div>
+      <div class="input-block-node"><input class="screenshot-input" placeholder="NIC"><span class="bottom-descriptor-label">NIC / ID Number</span></div>
+      <div class="input-block-node"><select class="screenshot-input"><option>Front Office</option></select><span class="bottom-descriptor-label">Department</span></div>
+      <div class="form-actions-row"><button class="screenshot-btn clear-btn-node">Clear</button><button class="screenshot-btn submit-btn-node">Add Staff</button></div>
+    </form></div></div>
+  <div class="ledger-header"><div class="ledger-header-left"><h4>Personnel Registry</h4><p>Consolidated staff ledger synchronized in real-time.</p></div>
+    <div class="ledger-header-right"><label>Period</label><select><option>All</option></select><input type="date"><button class="download-pdf-btn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Download PDF Report</button></div></div>
+  <div class="linear-ledger-surface-container" style="overflow:hidden;">
+    <table><thead><tr><th>#</th><th>Name</th><th>Role</th><th>Phone</th><th>Salary</th></tr></thead>
+    <tbody><tr><td>1</td><td>Oshan Ekanayake</td><td>Chef</td><td>0771234567</td><td>LKR 80,000</td></tr></tbody></table></div>
+</div>
+<div class="as-toast-root">
+  <div class="as-toast as-toast--success as-toast--in"><span class="as-toast__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></span><span class="as-toast__msg">Staff member added successfully!</span><button class="as-toast__close">&times;</button></div>
+  <div class="as-toast as-toast--error as-toast--in"><span class="as-toast__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></span><span class="as-toast__msg">Please fill all required fields.</span><button class="as-toast__close">&times;</button></div>
+</div>
+</body></html>
