@@ -9,7 +9,8 @@
         editingId: null,
         displayCurrency: 'LKR',
         exchangeRate: null,
-        activeGuests: [] // { bookingId, name, nic, roomNumber }
+        activeGuests: [], // { bookingId, name, nic, roomNumber }
+        menuItems: []     // { id, name, price } saved restaurant menu
     };
 
     const auth = firebase.auth();
@@ -243,26 +244,52 @@
         ]));
     }
 
+    // Build the <option> list for the item dropdown from saved menu items.
+    function menuOptionsHtml(selectedName) {
+        const opts = ['<option value="">— Select item —</option>'];
+        state.menuItems.forEach(m => {
+            const sel = selectedName && m.name === selectedName ? 'selected' : '';
+            opts.push(`<option value="${escapeHtml(m.name)}" data-price="${Number(m.price) || 0}" ${sel}>${escapeHtml(m.name)} — ${FinanceUtils.formatMoney(Number(m.price) || 0, 'LKR')}</option>`);
+        });
+        // Custom option: lets staff type a one-off item not on the menu.
+        const isCustom = selectedName && !state.menuItems.some(m => m.name === selectedName);
+        opts.push(`<option value="__custom__" ${isCustom ? 'selected' : ''}>✏️ Custom item…</option>`);
+        return opts.join('');
+    }
+
     function addItemRow(item) {
         const container = byId('itemsContainer');
         if (!container) return;
         const row = document.createElement('div');
         row.className = 'item-row';
+        const presetName = item && item.name ? String(item.name) : '';
+        const isCustom = presetName && !state.menuItems.some(m => m.name === presetName);
         row.innerHTML = `
-            <input class="item-name" type="text" list="restaurantItemOptions" placeholder="Item or menu name" value="${escapeHtml(item && item.name)}" autocomplete="off" required>
+            <div class="item-pick">
+                <select class="item-select" required>${menuOptionsHtml(presetName)}</select>
+                <input class="item-name-custom" type="text" placeholder="Custom item name" value="${escapeHtml(presetName)}" ${isCustom ? '' : 'hidden'} autocomplete="off">
+            </div>
             <input class="item-quantity" type="number" min="1" step="1" value="${Number(item && item.quantity) || 1}" required>
-            <input class="item-price" type="number" min="0" step="0.01" placeholder="Unit price" value="${item && Number.isFinite(Number(item.unitPrice)) ? Number(item.unitPrice) : ''}" required>
+            <input class="item-price" type="number" min="0" step="0.01" placeholder="Unit price" value="${item && Number.isFinite(Number(item.unitPrice)) ? Number(item.unitPrice) : ''}" ${isCustom ? '' : 'readonly'} required>
             <button class="icon-btn remove-item" type="button" aria-label="Remove item">Remove</button>`;
         container.appendChild(row);
         updateFormTotal();
     }
 
+    // Reads item rows: name from dropdown (or custom input), price auto from menu.
     function readItems() {
-        return Array.from(document.querySelectorAll('#itemsContainer .item-row')).map(row => ({
-            name: row.querySelector('.item-name').value.trim(),
-            quantity: Number(row.querySelector('.item-quantity').value),
-            unitPrice: Number(row.querySelector('.item-price').value)
-        }));
+        return Array.from(document.querySelectorAll('#itemsContainer .item-row')).map(row => {
+            const sel = row.querySelector('.item-select');
+            const val = sel ? sel.value : '';
+            let name;
+            if (val === '__custom__') name = (row.querySelector('.item-name-custom').value || '').trim();
+            else name = val.trim();
+            return {
+                name,
+                quantity: Number(row.querySelector('.item-quantity').value),
+                unitPrice: Number(row.querySelector('.item-price').value)
+            };
+        }).filter(it => it.name);
     }
 
     function validItems(items) {
@@ -482,6 +509,29 @@
             byId('cancelEditBtn').addEventListener('click', resetForm);
             byId('orderCurrency').addEventListener('change', updateFormTotal);
             byId('itemsContainer').addEventListener('input', updateFormTotal);
+            // When an item is picked from the dropdown, auto-fill its price.
+            // "Custom item" reveals a name box and makes the price editable.
+            byId('itemsContainer').addEventListener('change', event => {
+                const sel = event.target.closest('.item-select');
+                if (!sel) return;
+                const row = sel.closest('.item-row');
+                const nameBox = row.querySelector('.item-name-custom');
+                const priceBox = row.querySelector('.item-price');
+                if (sel.value === '__custom__') {
+                    nameBox.hidden = false;
+                    priceBox.readOnly = false;
+                    priceBox.value = '';
+                    nameBox.focus();
+                } else {
+                    nameBox.hidden = true;
+                    nameBox.value = '';
+                    const opt = sel.options[sel.selectedIndex];
+                    const price = opt ? Number(opt.dataset.price || 0) : 0;
+                    priceBox.value = price;
+                    priceBox.readOnly = true;
+                }
+                updateFormTotal();
+            });
             byId('itemsContainer').addEventListener('click', event => {
                 const button = event.target.closest('.remove-item');
                 if (!button) return;
@@ -489,8 +539,63 @@
                 button.closest('.item-row').remove();
                 updateFormTotal();
             });
+
+            // Menu manager: add item
+            const menuForm = byId('menuItemForm');
+            if (menuForm) menuForm.addEventListener('submit', addMenuItem);
+            const menuList = byId('menuItemsList');
+            if (menuList) menuList.addEventListener('click', event => {
+                const del = event.target.closest('.mc-del');
+                if (del) deleteMenuItem(del.dataset.id);
+            });
             resetForm();
         }
+    }
+
+    // ---- Menu items (stored in buffetItems collection: {hotelId,name,price}) ----
+    async function loadMenuItems() {
+        try {
+            const snap = await db.collection('buffetItems').where('hotelId', '==', state.hotelId).get();
+            state.menuItems = snap.docs
+                .map(d => ({ id: d.id, name: d.data().name, price: Number(d.data().price) || 0 }))
+                .filter(m => m.name)
+                .sort((a, b) => a.name.localeCompare(b.name));
+        } catch (e) {
+            console.warn('Could not load menu items:', e.message);
+            state.menuItems = [];
+        }
+        renderMenuItems();
+    }
+
+    function renderMenuItems() {
+        const list = byId('menuItemsList');
+        if (!list) return;
+        if (!state.menuItems.length) {
+            list.innerHTML = '<span class="menu-empty">No menu items yet. Add your restaurant items above.</span>';
+            return;
+        }
+        list.innerHTML = state.menuItems.map(m =>
+            `<span class="menu-chip"><span class="mc-name">${escapeHtml(m.name)}</span><span class="mc-price">${FinanceUtils.formatMoney(m.price, 'LKR')}</span><button class="mc-del" type="button" data-id="${m.id}" title="Remove">✕</button></span>`
+        ).join('');
+    }
+
+    async function addMenuItem(event) {
+        event.preventDefault();
+        const name = (byId('menuItemName').value || '').trim();
+        const price = Number(byId('menuItemPrice').value);
+        if (!name || !Number.isFinite(price) || price < 0) { alert('Enter an item name and a valid price.'); return; }
+        if (state.menuItems.some(m => m.name.toLowerCase() === name.toLowerCase())) { alert('That item is already on the menu.'); return; }
+        try {
+            await db.collection('buffetItems').add({ hotelId: state.hotelId, name, price, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+            byId('menuItemForm').reset();
+            await loadMenuItems();
+        } catch (e) { alert('Could not add menu item: ' + e.message); }
+    }
+
+    async function deleteMenuItem(id) {
+        if (!confirm('Remove this item from the menu?')) return;
+        try { await db.collection('buffetItems').doc(id).delete(); await loadMenuItems(); }
+        catch (e) { alert('Could not remove item: ' + e.message); }
     }
 
     auth.onAuthStateChanged(async user => {
@@ -509,7 +614,11 @@
                 byId('avatarInitials').textContent = profileName.split(/\s+/).map(part => part[0]).join('').toUpperCase().slice(0, 2) || 'U';
             }
             if (!canManage() && byId('restaurantFormPanel')) byId('restaurantFormPanel').hidden = true;
+            if (!canManage() && byId('menuPanel')) byId('menuPanel').hidden = true;
             if (!canDownload()) byId('downloadReportBtn').hidden = true;
+            // Load the saved menu FIRST so the order item dropdown is populated
+            // before the form's first item row is created in wireEvents().
+            if (canManage()) await loadMenuItems();
             wireEvents();
             await Promise.all([loadOrders(), loadRate()]);
             openRequestedRestaurantSource();

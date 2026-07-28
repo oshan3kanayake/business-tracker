@@ -40,6 +40,17 @@
             <p class="rate-line" id="exchangeRateLabel">Loading USD/LKR exchange rate…</p>
         </section>
 
+        <section class="panel" id="menuPanel" data-requires="manager">
+            <h2>🍴 Menu Items</h2>
+            <p class="menu-hint">Save your restaurant items once here. When taking an order you can pick them from a dropdown and the price fills in automatically.</p>
+            <form id="menuItemForm" class="menu-add-row">
+                <input type="text" id="menuItemName" placeholder="Item name (e.g. Chicken Fried Rice)" required>
+                <input type="number" id="menuItemPrice" placeholder="Price" min="0" step="0.01" required>
+                <button class="btn" type="submit">Add to menu</button>
+            </form>
+            <div id="menuItemsList" class="menu-items-list"><span class="menu-empty">Loading menu…</span></div>
+        </section>
+
         <section class="panel" id="restaurantFormPanel" data-requires="manager">
             <h2 id="formTitle">Add Restaurant Order</h2>
             <form id="restaurantForm">
@@ -57,7 +68,7 @@
                     <div class="field"><label for="paymentStatus">Payment</label><select id="paymentStatus"><option value="pending">Pending</option><option value="paid">Confirmed / Paid</option></select></div>
                     <div class="field wide"><label for="orderNotes">Notes</label><input id="orderNotes" type="text"></div>
                 </div>
-                <div class="items-heading"><h3>Items and menu prices</h3><button class="btn secondary" id="addItemBtn" type="button">Add item</button></div>
+                <div class="items-heading"><h3>Order items</h3><button class="btn secondary" id="addItemBtn" type="button">+ Add item line</button></div>
                 <div id="itemsContainer"></div>
                 <datalist id="restaurantGuestOptions"></datalist>
                 <datalist id="restaurantRoomOptions"></datalist>
