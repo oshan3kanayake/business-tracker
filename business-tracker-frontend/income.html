@@ -1191,8 +1191,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 hotelId = currentUserData.role === 'staff' ? currentUserData.hotelId : user.uid;
                 if (!hotelId) throw new Error('No hotel is assigned to this account.');
                 if (currentUserData.role === 'staff') {
-                    const formPanel = document.querySelector('.cinematic-environment-container');
-                    if (formPanel) formPanel.style.display = 'none';
+                    // Staff CAN add manual income, so the income form stays visible.
+                    // Staff still cannot download reports.
                     const download = document.getElementById('downloadPdfBtn');
                     if (download) download.style.display = 'none';
                 }
