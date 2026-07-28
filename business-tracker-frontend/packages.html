@@ -1303,90 +1303,10 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
     </header>
 
     <div class="utility-download-control-row">
-        <h2>Packages &amp; Buffet Console</h2>
+        <h2>Packages</h2>
     </div>
 
     <main class="dashboard-telemetry-section">
-
-        <!-- TODAY'S MENU -->
-        <div class="today-menu-section" id="todayMenuSection">
-            <div class="today-menu-header">
-                <div class="today-menu-header-left">
-                    <span class="today-menu-kicker">Culinary Program</span>
-                    <h4>Today's Menu</h4>
-                </div>
-                <span class="date-badge" id="todayDateBadge">Loading date...</span>
-            </div>
-            <div id="todayMenuContent">
-                <div class="no-menu-message">Loading today's menu...</div>
-            </div>
-        </div>
-
-        <!-- BUFFET FORM -->
-        <div class="cinematic-environment-container">
-            <div class="right-side-form-panel">
-                <form id="buffetForm" class="vertical-input-stack">
-                    <h4 style="color:#fff; font-weight:600; font-size:0.9rem; margin-bottom:2px;">🍽️ Add Buffet Items</h4>
-                    <div class="input-block-node">
-                        <input type="date" id="buffetDate" class="screenshot-input" required>
-                        <span class="bottom-descriptor-label">Date</span>
-                    </div>
-                    <div class="input-block-node">
-                        <div class="dropdown-with-custom" id="buffetMealTypeWrapper">
-                            <select id="buffetMealTypeSelect" required>
-                                <option value="">Select Meal Type</option>
-                                <option value="Breakfast">Breakfast</option>
-                                <option value="Lunch">Lunch</option>
-                                <option value="Evening Snack">Evening Snack</option>
-                                <option value="Dinner">Dinner</option>
-                                <option value="Custom">-- Custom --</option>
-                            </select>
-                            <input type="text" id="buffetMealTypeCustom" placeholder="Enter custom meal type">
-                        </div>
-                        <span class="bottom-descriptor-label">Meal Type</span>
-                    </div>
-                    <div id="buffetItemsContainer">
-                        <div class="item-row" data-index="0">
-                            <input type="text" class="buffet-item-name" placeholder="Item name" required>
-                            <input type="number" class="buffet-item-qty" placeholder="Qty" value="1" min="1" required>
-                            <button type="button" class="remove-item-btn" onclick="removeBuffetItem(this)" style="display:none;">✕</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-more-btn" onclick="addBuffetItemRow()">➕ Add More Item</button>
-                    <div class="form-actions-row">
-                        <button type="reset" class="screenshot-btn clear-btn-node">Clear</button>
-                        <button type="submit" class="screenshot-btn submit-btn-node" id="submitBuffetBtn">Add Items</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- BUFFET ITEMS LIST -->
-        <div class="section-card">
-            <div class="section-header">
-                <h4>📋 Buffet Items</h4>
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                    <div class="ledger-header-right" style="background:transparent; padding:0; border:none;">
-                        <label>Period</label>
-                        <select id="reportPeriodFilter">
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month" selected>This Month</option>
-                            <option value="year">This Year</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                        <input type="date" id="reportStartDate" style="display:none; width:140px;">
-                        <input type="date" id="reportEndDate" style="display:none; width:140px;">
-                    </div>
-                    <button class="btn-primary-small" id="downloadBuffetReportBtn" data-requires="manager">📥 Report</button>
-                </div>
-            </div>
-            <div class="section-body">
-                <div id="buffetDisplayContainer">
-                    <div class="empty-state">Loading buffet items...</div>
-                </div>
-            </div>
-        </div>
 
         <!-- PACKAGES FORM -->
         <div
@@ -1455,38 +1375,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
 
     </main>
 
-    <!-- EDIT BUFFET MODAL -->
-    <div class="modal-overlay" id="editBuffetModal">
-        <div class="modal">
-            <h2>✏️ Edit Buffet Items</h2>
-            <form id="editBuffetForm">
-                <input type="hidden" id="editBuffetId">
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" id="editBuffetDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Meal Type</label>
-                    <input type="text" id="editBuffetMealType" required placeholder="e.g. Breakfast, Lunch">
-                </div>
-                <div class="form-group">
-                    <label>Items</label>
-                    <div id="editBuffetItemsContainer">
-                        <div class="item-row" data-index="0">
-                            <input type="text" class="edit-buffet-item-name" placeholder="Item name" required>
-                            <input type="number" class="edit-buffet-item-qty" placeholder="Qty" value="1" min="1" required>
-                            <button type="button" class="remove-item-btn" onclick="removeEditBuffetItem(this)" style="display:none;">✕</button>
-                        </div>
-                    </div>
-                    <button type="button" class="add-more-btn" onclick="addEditBuffetItemRow()">➕ Add More Item</button>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-cancel" onclick="closeEditBuffetModal()">Cancel</button>
-                    <button type="submit" class="btn-submit">Update Items</button>
-                </div>
-            </form>
-        </div>
-    </div>
+
 
     <!-- EDIT PACKAGE MODAL -->
     <div class="modal-overlay" id="editPackageModal" data-requires="manager">
@@ -1559,26 +1448,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             return false;
         }
 
-        let buffetItems = [];
         let packages = [];
-        let currentFilter = 'month';
-        let startDate, endDate;
-
-        // --- DROPDOWN + CUSTOM TOGGLES ---
-        const mealTypeSelect = document.getElementById('buffetMealTypeSelect');
-        if (mealTypeSelect) {
-            mealTypeSelect.addEventListener('change', function() {
-                const custom = document.getElementById('buffetMealTypeCustom');
-                if (this.value === 'Custom') {
-                    if (custom) custom.classList.add('show');
-                    if (custom) custom.required = true;
-                } else {
-                    if (custom) custom.classList.remove('show');
-                    if (custom) custom.required = false;
-                    if (custom) custom.value = '';
-                }
-            });
-        }
 
         const packageNameSelect = document.getElementById('packageNameSelect');
         if (packageNameSelect) {
@@ -1594,63 +1464,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 }
             });
         }
-
-        // --- BUFFET ITEM ROWS (Add Form) ---
-        let buffetItemIndex = 1;
-
-        function addBuffetItemRow() {
-            const container = document.getElementById('buffetItemsContainer');
-            if (!container) return;
-            const row = document.createElement('div');
-            row.className = 'item-row';
-            row.dataset.index = buffetItemIndex++;
-            row.innerHTML = `
-                <input type="text" class="buffet-item-name" placeholder="Item name" required>
-                <input type="number" class="buffet-item-qty" placeholder="Qty" value="1" min="1" required>
-                <button type="button" class="remove-item-btn" onclick="removeBuffetItem(this)">✕</button>
-            `;
-            container.appendChild(row);
-        }
-
-        function removeBuffetItem(btn) {
-            const row = btn.closest('.item-row');
-            const container = document.getElementById('buffetItemsContainer');
-            if (!container) return;
-            if (container.children.length <= 1) {
-                alert('You need at least one item.');
-                return;
-            }
-            row.remove();
-        }
-
-        // --- EDIT BUFFET ITEM ROWS ---
-        let editBuffetItemIndex = 0;
-
-        function addEditBuffetItemRow() {
-            const container = document.getElementById('editBuffetItemsContainer');
-            if (!container) return;
-            const row = document.createElement('div');
-            row.className = 'item-row';
-            row.dataset.index = editBuffetItemIndex++;
-            row.innerHTML = `
-                <input type="text" class="edit-buffet-item-name" placeholder="Item name" required>
-                <input type="number" class="edit-buffet-item-qty" placeholder="Qty" value="1" min="1" required>
-                <button type="button" class="remove-item-btn" onclick="removeEditBuffetItem(this)">✕</button>
-            `;
-            container.appendChild(row);
-        }
-
-        function removeEditBuffetItem(btn) {
-            const row = btn.closest('.item-row');
-            const container = document.getElementById('editBuffetItemsContainer');
-            if (!container) return;
-            if (container.children.length <= 1) {
-                alert('You need at least one item.');
-                return;
-            }
-            row.remove();
-        }
-
         // --- AUTH ---
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = '/'; return; }
@@ -1686,36 +1499,9 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     initialsElement.textContent = initials || 'U';
                 }
 
-                const today = new Date().toISOString().split('T')[0];
-                const dateBadge = document.getElementById('todayDateBadge');
-                if (dateBadge) {
-                    dateBadge.textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                }
-                const buffetDateInput = document.getElementById('buffetDate');
-                if (buffetDateInput) buffetDateInput.value = today;
-
-                await loadBuffetItems();
                 await loadPackages();
-                renderTodayMenu();
-                applyFilter('month');
             } catch (e) { console.error(e); }
         });
-
-        // --- LOAD BUFFET ITEMS ---
-        async function loadBuffetItems() {
-            try {
-                const snap = await db.collection('buffetItems').where('hotelId', '==', hotelId).get();
-                buffetItems = [];
-                snap.forEach(d => buffetItems.push({ id: d.id, ...d.data() }));
-                buffetItems.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-                renderBuffetDisplay();
-                renderTodayMenu();
-            } catch (e) {
-                console.error('Error loading buffet items:', e);
-                const container = document.getElementById('buffetDisplayContainer');
-                if (container) container.innerHTML = `<div class="empty-state">Error loading buffet items.</div>`;
-            }
-        }
 
         // --- LOAD PACKAGES ---
         async function loadPackages() {
@@ -1729,171 +1515,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 const tbody = document.getElementById('packageTableBody');
                 if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Error loading packages.</td></tr>`;
             }
-        }
-
-        // --- RENDER TODAY'S MENU ---
-        function renderTodayMenu() {
-            const container = document.getElementById('todayMenuContent');
-            if (!container) return;
-            const today = new Date().toISOString().split('T')[0];
-            const todayItems = buffetItems.filter(item => item.date === today);
-
-            if (!todayItems.length) {
-                container.innerHTML = `<div class="no-menu-message">No menu items set for today. Add items below.</div>`;
-                return;
-            }
-
-            const grouped = {};
-            todayItems.forEach(item => {
-                const type = item.mealType || 'Other';
-                if (!grouped[type]) grouped[type] = [];
-                if (item.items && Array.isArray(item.items)) {
-                    item.items.forEach(i => {
-                        grouped[type].push(i);
-                    });
-                }
-            });
-
-            let html = '<div class="today-menu-grid">';
-            for (const [mealType, items] of Object.entries(grouped)) {
-                const mtClass = mealType.toLowerCase().includes('breakfast') ? 'mt-breakfast' :
-                                mealType.toLowerCase().includes('lunch') ? 'mt-lunch' :
-                                mealType.toLowerCase().includes('dinner') ? 'mt-dinner' :
-                                mealType.toLowerCase().includes('snack') ? 'mt-snack' : 'mt-other';
-                const initial = (mealType || 'M').charAt(0).toUpperCase();
-                html += `
-                    <div class="today-menu-item ${mtClass}">
-                        <div class="meal-type">
-                            <span class="meal-type-mark">${initial}</span>
-                            <span class="meal-type-name">${mealType}</span>
-                            <span class="meal-type-count">${items.length} item${items.length === 1 ? '' : 's'}</span>
-                        </div>
-                        <div class="meal-items">
-                            ${items.map(i => `<span>${i.name}<span class="qty">${i.quantity || 1}</span></span>`).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        // --- FILTER LOGIC (EXACTLY LIKE EXPENSES) ---
-        function applyFilter(period) {
-            currentFilter = period;
-            const now = new Date();
-            let start, end;
-
-            if (period === 'today') {
-                start = now.toISOString().split('T')[0];
-                end = start;
-            } else if (period === 'week') {
-                const s = new Date(now);
-                s.setDate(now.getDate() - now.getDay());
-                start = s.toISOString().split('T')[0];
-                const e = new Date(s);
-                e.setDate(s.getDate() + 6);
-                end = e.toISOString().split('T')[0];
-            } else if (period === 'month') {
-                start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-                end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-            } else if (period === 'year') {
-                start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
-                end = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0];
-            } else {
-                start = document.getElementById('reportStartDate').value;
-                end = document.getElementById('reportEndDate').value;
-                if (!start || !end) { alert('Select both dates for custom period.'); return; }
-            }
-
-            startDate = start;
-            endDate = end;
-            renderBuffetDisplay();
-        }
-
-        // --- RENDER BUFFET DISPLAY ---
-        function renderBuffetDisplay() {
-            const container = document.getElementById('buffetDisplayContainer');
-            if (!container) return;
-
-            let filtered = buffetItems;
-            if (startDate && endDate) {
-                filtered = buffetItems.filter(item => {
-                    if (!item.date) return false;
-                    return item.date >= startDate && item.date <= endDate;
-                });
-            }
-
-            if (!filtered.length) {
-                container.innerHTML = `<div class="empty-state">No buffet items found for the selected period.</div>`;
-                return;
-            }
-
-            const groupedByDate = {};
-            filtered.forEach(item => {
-                const date = item.date || 'Unknown';
-                if (!groupedByDate[date]) groupedByDate[date] = [];
-                groupedByDate[date].push(item);
-            });
-
-            const sortedDates = Object.keys(groupedByDate).sort((a, b) => b.localeCompare(a));
-
-            let html = '';
-            sortedDates.forEach(date => {
-                const items = groupedByDate[date];
-                const displayDate = new Date(date + 'T00:00:00').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-                const groupedByMeal = {};
-                items.forEach(item => {
-                    const mealType = item.mealType || 'Other';
-                    if (!groupedByMeal[mealType]) groupedByMeal[mealType] = [];
-                    if (item.items && Array.isArray(item.items)) {
-                        item.items.forEach(i => {
-                            groupedByMeal[mealType].push(i);
-                        });
-                    }
-                });
-
-                const dateId = items[0]?.id;
-
-                html += `<div class="buffet-date-group" data-date="${date}" data-id="${dateId}">`;
-                html += `<div class="date-title">`;
-                html += `<span>📅 ${displayDate}</span>`;
-                html += `<button class="delete-day-btn" onclick="deleteEntireDay('${date}')">🗑️ Delete Day</button>`;
-                html += `</div>`;
-
-                for (const [mealType, mealItems] of Object.entries(groupedByMeal)) {
-                    const mealItem = items.find(item => item.mealType === mealType);
-                    html += `<div class="buffet-meal-row" data-meal-id="${mealItem?.id || ''}">`;
-                    html += `<span class="meal-label">${mealType}</span>`;
-                    html += `<span class="items-list">`;
-                    html += mealItems.map(i => `<span>${i.name} <span class="qty">(×${i.quantity || 1})</span></span>`).join(', ');
-                    html += `</span>`;
-                    html += `<div class="meal-actions">`;
-                    html += `<button class="edit-btn" onclick="openEditBuffetModal('${mealItem?.id || ''}')">✏️ Edit</button>`;
-                    html += `<button class="delete-btn" onclick="deleteBuffetItem('${mealItem?.id || ''}')">🗑️ Delete</button>`;
-                    html += `</div>`;
-                    html += `</div>`;
-                }
-
-                html += `</div>`;
-            });
-
-            container.innerHTML = html;
-        }
-
-        // --- DELETE ENTIRE DAY ---
-        async function deleteEntireDay(date) {
-            if (!confirm(`Delete ALL buffet items for ${date}?`)) return;
-            try {
-                const itemsToDelete = buffetItems.filter(item => item.date === date);
-                for (const item of itemsToDelete) {
-                    await db.collection('buffetItems').doc(item.id).delete();
-                }
-                await loadBuffetItems();
-                renderTodayMenu();
-                renderBuffetDisplay();
-            } catch (e) { alert('Error: ' + e.message); }
         }
 
         // --- RENDER PACKAGE TABLE ---
@@ -1916,195 +1537,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     </td>
                 </tr>
             `).join('');
-        }
-
-        // --- ADD BUFFET ITEMS ---
-        const buffetForm = document.getElementById('buffetForm');
-        if (buffetForm) {
-            buffetForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const date = document.getElementById('buffetDate').value;
-                const mealTypeSelect = document.getElementById('buffetMealTypeSelect');
-                const mealTypeCustom = document.getElementById('buffetMealTypeCustom');
-                let mealType = mealTypeSelect.value;
-                if (mealType === 'Custom' && mealTypeCustom.value.trim()) {
-                    mealType = mealTypeCustom.value.trim();
-                } else if (mealType === 'Custom' || !mealType) {
-                    alert('Please select or enter a meal type.');
-                    return;
-                }
-
-                const itemRows = document.querySelectorAll('#buffetItemsContainer .item-row');
-                const items = [];
-                let hasError = false;
-                itemRows.forEach(row => {
-                    const name = row.querySelector('.buffet-item-name').value.trim();
-                    const qty = parseInt(row.querySelector('.buffet-item-qty').value) || 1;
-                    if (!name) {
-                        hasError = true;
-                        return;
-                    }
-                    items.push({ name, quantity: qty });
-                });
-
-                if (hasError || !items.length) {
-                    alert('Please add at least one item with a name.');
-                    return;
-                }
-
-                const btn = document.getElementById('submitBuffetBtn');
-                btn.textContent = 'Adding...';
-                btn.disabled = true;
-
-                try {
-                    await db.collection('buffetItems').add({
-                        hotelId,
-                        date,
-                        mealType,
-                        items: items,
-                        createdAt: new Date()
-                    });
-
-                    buffetForm.reset();
-                    const dateInput = document.getElementById('buffetDate');
-                    if (dateInput) dateInput.value = date;
-                    const customInput = document.getElementById('buffetMealTypeCustom');
-                    if (customInput) {
-                        customInput.classList.remove('show');
-                        customInput.value = '';
-                    }
-                    const container = document.getElementById('buffetItemsContainer');
-                    if (container) {
-                        container.innerHTML = `
-                            <div class="item-row" data-index="0">
-                                <input type="text" class="buffet-item-name" placeholder="Item name" required>
-                                <input type="number" class="buffet-item-qty" placeholder="Qty" value="1" min="1" required>
-                                <button type="button" class="remove-item-btn" onclick="removeBuffetItem(this)" style="display:none;">✕</button>
-                            </div>
-                        `;
-                    }
-                    buffetItemIndex = 1;
-
-                    alert('✅ Buffet items added!');
-                    await loadBuffetItems();
-                    renderTodayMenu();
-                    renderBuffetDisplay();
-                } catch (error) {
-                    alert('Error: ' + error.message);
-                }
-
-                btn.textContent = 'Add Items';
-                btn.disabled = false;
-            });
-        }
-
-        // --- DELETE BUFFET ITEM (Single Meal Type) ---
-        async function deleteBuffetItem(id) {
-            if (!id) { alert('Item not found.'); return; }
-            if (!confirm('Delete this meal type?')) return;
-            try {
-                await db.collection('buffetItems').doc(id).delete();
-                await loadBuffetItems();
-                renderTodayMenu();
-                renderBuffetDisplay();
-            } catch (e) { alert('Error: ' + e.message); }
-        }
-
-        // --- EDIT BUFFET MODAL ---
-        let editBuffetId = null;
-
-        function openEditBuffetModal(id) {
-            if (!id) { alert('Item not found.'); return; }
-            const item = buffetItems.find(b => b.id === id);
-            if (!item) { alert('Item not found.'); return; }
-            editBuffetId = id;
-            document.getElementById('editBuffetId').value = id;
-            document.getElementById('editBuffetDate').value = item.date || '';
-            document.getElementById('editBuffetMealType').value = item.mealType || '';
-
-            const container = document.getElementById('editBuffetItemsContainer');
-            if (!container) return;
-            container.innerHTML = '';
-            editBuffetItemIndex = 0;
-            if (item.items && Array.isArray(item.items) && item.items.length > 0) {
-                item.items.forEach(i => {
-                    const row = document.createElement('div');
-                    row.className = 'item-row';
-                    row.dataset.index = editBuffetItemIndex++;
-                    row.innerHTML = `
-                        <input type="text" class="edit-buffet-item-name" placeholder="Item name" value="${i.name || ''}" required>
-                        <input type="number" class="edit-buffet-item-qty" placeholder="Qty" value="${i.quantity || 1}" min="1" required>
-                        <button type="button" class="remove-item-btn" onclick="removeEditBuffetItem(this)">✕</button>
-                    `;
-                    container.appendChild(row);
-                });
-            } else {
-                const row = document.createElement('div');
-                row.className = 'item-row';
-                row.dataset.index = editBuffetItemIndex++;
-                row.innerHTML = `
-                    <input type="text" class="edit-buffet-item-name" placeholder="Item name" required>
-                    <input type="number" class="edit-buffet-item-qty" placeholder="Qty" value="1" min="1" required>
-                    <button type="button" class="remove-item-btn" onclick="removeEditBuffetItem(this)" style="display:none;">✕</button>
-                `;
-                container.appendChild(row);
-            }
-
-            const modal = document.getElementById('editBuffetModal');
-            if (modal) modal.classList.add('show');
-        }
-
-        function closeEditBuffetModal() {
-            const modal = document.getElementById('editBuffetModal');
-            if (modal) modal.classList.remove('show');
-            editBuffetId = null;
-        }
-
-        const editBuffetForm = document.getElementById('editBuffetForm');
-        if (editBuffetForm) {
-            editBuffetForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const id = document.getElementById('editBuffetId').value;
-                const date = document.getElementById('editBuffetDate').value;
-                const mealType = document.getElementById('editBuffetMealType').value.trim();
-
-                const rows = document.querySelectorAll('#editBuffetItemsContainer .item-row');
-                const items = [];
-                let hasError = false;
-                rows.forEach(row => {
-                    const name = row.querySelector('.edit-buffet-item-name').value.trim();
-                    const qty = parseInt(row.querySelector('.edit-buffet-item-qty').value) || 1;
-                    if (!name) {
-                        hasError = true;
-                        return;
-                    }
-                    items.push({ name, quantity: qty });
-                });
-
-                if (hasError || !items.length) {
-                    alert('Please add at least one item with a name.');
-                    return;
-                }
-
-                try {
-                    await db.collection('buffetItems').doc(id).update({
-                        date, mealType, items
-                    });
-                    alert('✅ Buffet items updated!');
-                    closeEditBuffetModal();
-                    await loadBuffetItems();
-                    renderTodayMenu();
-                    renderBuffetDisplay();
-                } catch (e) { alert('Error: ' + e.message); }
-            });
-        }
-
-        const editBuffetModal = document.getElementById('editBuffetModal');
-        if (editBuffetModal) {
-            editBuffetModal.addEventListener('click', function(e) {
-                if (e.target === this) closeEditBuffetModal();
-            });
         }
 
         // --- ADD PACKAGE ---
@@ -2279,69 +1711,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             });
         }
 
-        // --- DOWNLOAD BUFFET REPORT ---
-        const downloadBuffetBtn = document.getElementById('downloadBuffetReportBtn');
-        if (downloadBuffetBtn) {
-            downloadBuffetBtn.addEventListener('click', function() {
-                if (
-                    !requireManagerAction(
-                        "Staff accounts cannot download reports."
-                    )
-                ) {
-                    return;
-                }
-
-                const { jsPDF } = window.jspdf;
-                let filtered = buffetItems;
-                if (startDate && endDate) {
-                    filtered = buffetItems.filter(item => {
-                        if (!item.date) return false;
-                        return item.date >= startDate && item.date <= endDate;
-                    });
-                }
-                if (!filtered.length) { alert('No buffet items to export for the selected period.'); return; }
-
-                const doc = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const margin = 15;
-
-                doc.setFontSize(18);
-                doc.setTextColor(40, 40, 40);
-                doc.text('Buffet Items Report', pageWidth / 2, 20, { align: 'center' });
-
-                doc.setFontSize(10);
-                doc.setTextColor(100, 100, 100);
-                doc.text(`Hotel: ${currentUserData?.businessName || 'N/A'}`, margin, 30);
-                doc.text(`Period: ${startDate || 'All'} to ${endDate || 'All'}`, margin, 36);
-                doc.text(`Generated: ${new Date().toLocaleString()}`, margin, 42);
-
-                const headers = ['#', 'Date', 'Meal Type', 'Items (Qty)'];
-                const rows = filtered.map((item, i) => {
-                    const itemsDisplay = item.items && Array.isArray(item.items) 
-                        ? item.items.map(i => `${i.name} (${i.quantity || 1})`).join(', ')
-                        : 'N/A';
-                    return [
-                        i + 1,
-                        item.date || 'N/A',
-                        item.mealType || 'N/A',
-                        itemsDisplay
-                    ];
-                });
-
-                doc.autoTable({
-                    startY: 50,
-                    head: [headers],
-                    body: rows,
-                    theme: 'striped',
-                    headStyles: { fillColor: [85, 115, 115], textColor: [255, 255, 255] },
-                    styles: { fontSize: 7 },
-                    margin: { left: margin, right: margin },
-                });
-
-                doc.save(`buffet-items-${new Date().toISOString().slice(0,10)}.pdf`);
-            });
-        }
-
         // --- DOWNLOAD PACKAGE REPORT ---
         const downloadPackageBtn = document.getElementById('downloadPackageReportBtn');
         if (downloadPackageBtn) {
@@ -2392,40 +1761,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             });
         }
 
-        // --- PERIOD FILTER CHANGE (EXACTLY LIKE EXPENSES) ---
-        const periodFilter = document.getElementById('reportPeriodFilter');
-        if (periodFilter) {
-            periodFilter.addEventListener('change', function() {
-                const customInputs = document.querySelectorAll('#reportStartDate, #reportEndDate');
-                if (this.value === 'custom') {
-                    customInputs.forEach(inp => { if (inp) inp.style.display = 'inline-block'; });
-                    const val = document.getElementById('reportStartDate').value;
-                    const val2 = document.getElementById('reportEndDate').value;
-                    if (val && val2) applyFilter('custom');
-                } else {
-                    customInputs.forEach(inp => { if (inp) inp.style.display = 'none'; });
-                    applyFilter(this.value);
-                }
-            });
-        }
-
-        const startDateInput = document.getElementById('reportStartDate');
-        const endDateInput = document.getElementById('reportEndDate');
-        if (startDateInput) {
-            startDateInput.addEventListener('change', function() {
-                if (document.getElementById('reportEndDate').value) {
-                    applyFilter('custom');
-                }
-            });
-        }
-        if (endDateInput) {
-            endDateInput.addEventListener('change', function() {
-                if (document.getElementById('reportStartDate').value) {
-                    applyFilter('custom');
-                }
-            });
-        }
-
         // --- LOGOUT ---
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
@@ -2441,20 +1776,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 gsap.to(container, { opacity: 1, y: 0, duration: 1.0 });
             });
         });
-
-        // --- AUTO RESET TODAY'S MENU AT MIDNIGHT ---
-        function checkMidnightReset() {
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(0, 0, 0, 0);
-            const msUntilMidnight = tomorrow - now;
-            setTimeout(() => {
-                renderTodayMenu();
-                setInterval(renderTodayMenu, 86400000);
-            }, msUntilMidnight);
-        }
-        checkMidnightReset();
     </script>
 
     <!-- --- EDIT PROFILE MODAL --- -->

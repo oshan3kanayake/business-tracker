@@ -553,38 +553,30 @@
             btn.disabled = true;
             
             try {
-                // Create user with Firebase Auth (username + @business.local)
-                const email = username + '@business.local';
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                const user = userCredential.user;
-                
-                // Save user data to Firestore
-                await db.collection('users').doc(user.uid).set({
-                    username: username,
-                    businessName: businessName,
-                    city: city,
-                    email: email,
-                    role: 'manager',
-                    createdAt: new Date()
+                const response = await fetch('/api/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        businessName: businessName,
+                        city: city
+                    })
                 });
+
+                const result = await response.json();
                 
-                // ✅ SIGN OUT the user so they can log in fresh
-                await auth.signOut();
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || 'Signup failed.');
+                }
                 
                 // ✅ Redirect to login page
                 window.location.href = '/';
                 
             } catch (error) {
-                let message = 'Signup failed. Please try again.';
-                if (error.code === 'auth/email-already-in-use') {
-                    message = 'Username already taken. Please choose another.';
-                } else if (error.code === 'auth/invalid-email') {
-                    message = 'Invalid username format.';
-                } else if (error.code === 'auth/weak-password') {
-                    message = 'Password is too weak. Use at least 6 characters.';
-                }
-                
-                errorMsg.textContent = message;
+                errorMsg.textContent = error.message || 'Signup failed. Please try again.';
                 errorMsg.classList.add('show');
                 btn.textContent = 'Initialize Registration';
                 btn.disabled = false;

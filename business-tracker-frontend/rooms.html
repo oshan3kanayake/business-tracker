@@ -1292,7 +1292,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
     </header>
 
     <div class="utility-download-control-row">
-        <h2>Rooms &amp; Bookings Console</h2>
+        <h2>Room</h2>
     </div>
 
     <main class="dashboard-telemetry-section">
@@ -1311,185 +1311,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             <div class="stat-card">
                 <div class="stat-number" id="availableRooms">0</div>
                 <div class="stat-label">Available</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="bookingRevenue">LKR 0</div>
-                <div class="stat-label">Revenue</div>
-                <div class="stat-sub" id="revenueCount">0 bookings</div>
-            </div>
-        </div>
-
-        <!-- CALENDAR -->
-        <div class="calendar-section">
-            <div class="calendar-header">
-                <h4>📅 Booking Calendar</h4>
-                <div class="calendar-nav">
-                    <button onclick="changeMonth(-1)">‹</button>
-                    <span class="month-label" id="calendarMonthLabel">June 2026</span>
-                    <button onclick="changeMonth(1)">›</button>
-                    <button onclick="changeMonth(0)" style="border-color:var(--color-sage);">Today</button>
-                </div>
-            </div>
-            <div class="calendar-grid" id="calendarGrid"></div>
-        </div>
-
-        <!-- BOOKING FORM -->
-        <div class="cinematic-environment-container">
-            <div class="right-side-form-panel">
-                <form id="bookingForm" class="vertical-input-stack">
-                    <h4 style="color:#fff; font-weight:600; font-size:0.95rem; margin-bottom:3px;">📝 New Booking</h4>
-                    
-                    <div class="input-block-node">
-                        <input type="text" id="bookingGuestName" class="screenshot-input" placeholder="Guest Full Name" required>
-                        <span class="bottom-descriptor-label">Guest Name</span>
-                    </div>
-                    
-                    <div style="display:flex; gap:10px; width:100%;">
-                        <div class="input-block-node" style="flex:1;">
-                            <input type="text" id="bookingNic" class="screenshot-input" placeholder="NIC Number">
-                            <span class="bottom-descriptor-label">NIC Number</span>
-                        </div>
-                        <div class="input-block-node" style="flex:1;">
-                            <input type="text" id="bookingPhone" class="screenshot-input" placeholder="Phone Number">
-                            <span class="bottom-descriptor-label">Phone Number</span>
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex; gap:10px; width:100%;">
-                        <div class="input-block-node" style="flex:1;">
-                            <select id="bookingGuestCount" class="screenshot-input" required>
-                                <option value="1">1 Guest</option>
-                                <option value="2">2 Guests</option>
-                                <option value="3">3 Guests</option>
-                                <option value="4">4 Guests</option>
-                                <option value="5">5 Guests</option>
-                                <option value="6">6 Guests</option>
-                                <option value="7">7 Guests</option>
-                                <option value="8">8 Guests</option>
-                                <option value="9">9 Guests</option>
-                                <option value="10">10 Guests</option>
-                            </select>
-                            <span class="bottom-descriptor-label">Number of Guests</span>
-                        </div>
-                        <div class="input-block-node" style="flex:1;">
-                            <select id="bookingRoom" class="screenshot-input" required>
-                                <option value="">Select Available Room</option>
-                            </select>
-                            <span class="bottom-descriptor-label">Room</span>
-                        </div>
-                    </div>
-                    
-                    <div class="date-time-row">
-                        <div class="input-block-node">
-                            <input type="date" id="bookingCheckIn" class="screenshot-input" required>
-                            <span class="bottom-descriptor-label">Check-In Date</span>
-                        </div>
-                        <div class="input-block-node">
-                            <input type="time" id="bookingCheckInTime" class="screenshot-input" value="14:00">
-                            <span class="bottom-descriptor-label">Check-In Time</span>
-                        </div>
-                    </div>
-                    
-                    <div class="date-time-row">
-                        <div class="input-block-node">
-                            <input type="date" id="bookingCheckOut" class="screenshot-input" required>
-                            <span class="bottom-descriptor-label">Check-Out Date</span>
-                        </div>
-                        <div class="input-block-node">
-                            <input type="time" id="bookingCheckOutTime" class="screenshot-input" value="11:00">
-                            <span class="bottom-descriptor-label">Check-Out Time</span>
-                        </div>
-                    </div>
-                    
-                    <div style="display:flex; gap:10px; width:100%;">
-                        <div class="input-block-node" style="flex:1;">
-                            <select id="bookingMeals" class="screenshot-input">
-                                <option value="">Loading packages...</option>
-                            </select>
-                            <span class="bottom-descriptor-label">Meals &amp; Packages</span>
-                        </div>
-                        <div class="input-block-node" style="flex:1;">
-                            <select id="bookingPaymentStatus" class="screenshot-input" required>
-                                <option value="pending">Pending</option>
-                                <option value="paid">Paid</option>
-                                <option value="no">No</option>
-                            </select>
-                            <span class="bottom-descriptor-label">Payment Status</span>
-                        </div>
-                    </div>
-                    
-                    <div class="input-block-node">
-                        <input type="text" id="bookingNotes" class="screenshot-input" placeholder="Special requests...">
-                        <span class="bottom-descriptor-label">Notes</span>
-                    </div>
-                    
-                    <div class="price-breakdown">
-                        <div class="row"><span>Room:</span><span id="pbRoom">LKR 0 × 0 nights = LKR 0</span></div>
-                        <div class="row"><span>Meals:</span><span id="pbMeals">LKR 0 × 0 guests × 0 nights = LKR 0</span></div>
-                        <div class="row total"><span>Total:</span><span id="pbTotal">LKR 0</span></div>
-                    </div>
-                    <div class="form-actions-row">
-                        <button type="reset" class="screenshot-btn clear-btn-node">Clear</button>
-                        <button type="submit" class="screenshot-btn submit-btn-node" id="submitBookingBtn">Create Booking</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- BOOKINGS LIST -->
-        <div class="section-card">
-            <div class="section-header">
-                <h4>📋 Bookings</h4>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                    <span id="bookingExchangeRateLabel" style="font-size:.68rem;color:#557373;font-weight:600;">Loading USD/LKR rate...</span>
-                    <div class="filter-group">
-                        <button class="btn-secondary-small filter-btn active" data-filter="all">All</button>
-                        <button class="btn-secondary-small filter-btn" data-filter="upcoming">Upcoming</button>
-                        <button class="btn-secondary-small filter-btn" data-filter="active">Active</button>
-                        <button class="btn-secondary-small filter-btn" data-filter="past">Past</button>
-                        <button class="btn-secondary-small filter-btn" data-filter="checked_out_early">Early</button>
-                        <button class="btn-secondary-small filter-btn" data-filter="cancelled">Cancelled</button>
-                    </div>
-                    <div class="ledger-header-right" style="background:transparent; padding:0; border:none; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-                        <label style="font-size:0.65rem; font-weight:600; color:var(--color-sage); text-transform:uppercase; letter-spacing:0.5px;">Period</label>
-                        <select id="bookingPeriodFilter" style="padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none;">
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month" selected>This Month</option>
-                            <option value="year">This Year</option>
-                            <option value="custom">Custom</option>
-                        </select>
-                        <input type="date" id="bookingFilterStart" style="display:none; padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none; width:130px;">
-                        <input type="date" id="bookingFilterEnd" style="display:none; padding:4px 10px; border:1px solid rgba(85,115,115,0.2); border-radius:4px; background:#fff; font-size:0.75rem; color:var(--color-espresso); outline:none; width:130px;">
-                        <select id="bookingCurrencyFilter" style="padding:4px 10px;"><option value="all">All Paid Currencies</option><option value="LKR">LKR</option><option value="USD">USD</option></select>
-                        <select id="bookingDisplayCurrency" style="padding:4px 10px;"><option value="LKR">Display LKR</option><option value="USD">Display USD</option></select>
-                    </div>
-                    <button class="btn-primary-small" id="downloadBookingReportBtn">📥 Report</button>
-                </div>
-            </div>
-            <div class="section-body">
-                <div class="table-wrap">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Guest</th>
-                                <th>NIC</th>
-                                <th>Phone</th>
-                                <th>Room</th>
-                                <th>Check-In</th>
-                                <th>Check-Out</th>
-                                <th>Total</th>
-                                <th>Payment</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bookingTableBody">
-                            <tr><td colspan="11" class="empty-state">Loading bookings...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
 
@@ -1531,10 +1352,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                         </div>
                         <span class="bottom-descriptor-label">Bed Capacity</span>
                     </div>
-                    <div class="input-block-node">
-                        <input type="number" id="roomRate" class="screenshot-input" placeholder="Nightly Rate (LKR)" required>
-                        <span class="bottom-descriptor-label">Nightly Tariff</span>
-                    </div>
+
                     <div class="input-block-node">
                         <select id="roomStatus" class="screenshot-input" required>
                             <option value="" disabled selected>Select Status</option>
@@ -1569,7 +1387,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                                 <th>Room</th>
                                 <th>Type</th>
                                 <th>Beds</th>
-                                <th>Rate</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -1721,10 +1538,7 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     <label>Bed Count</label>
                     <input type="text" id="editRoomBeds" required>
                 </div>
-                <div class="form-group">
-                    <label>Rate (LKR)</label>
-                    <input type="number" id="editRoomRate" required>
-                </div>
+
                 <div class="form-group">
                     <label>Status</label>
                     <select id="editRoomStatus">
@@ -1768,17 +1582,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         let currentUserData = null;
         let hotelId = null;
         let rooms = [];
-        let bookings = [];
-        let packages = [];
-        let currentMonth = new Date();
-        let currentBookingFilter = 'all';
-        let bookingFilterStart = null;
-        let bookingFilterEnd = null;
-        let bookingDisplayCurrency = 'LKR';
-        let bookingExchangeRate = null;
-
-        // For tracking payment status changes
-        let oldPaymentStatus = null;
 
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = '/'; return; }
@@ -1790,8 +1593,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 hotelId = currentUserData.role === 'staff' ? currentUserData.hotelId : user.uid;
                 if (!hotelId) throw new Error('No hotel is assigned to this account.');
                 if (currentUserData.role === 'staff') {
-                    document.getElementById('downloadBookingReportBtn').style.display = 'none';
-                    document.getElementById('downloadRoomReportBtn').style.display = 'none';
+                    const downloadBtn = document.getElementById('downloadRoomReportBtn');
+                    if (downloadBtn) downloadBtn.style.display = 'none';
                 }
                 
                 // Update profile avatar with initials
@@ -1807,115 +1610,9 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     initialsElement.textContent = initials || 'U';
                 }
                 
-                await loadPackages();
                 await loadRooms();
-                await loadBookings();
-                await loadBookingExchangeRate();
-                updateStats();
-                renderCalendar();
-                populateRoomSelects();
-                populateEditRoomSelects();
-                populatePackageSelect();
-                const today = new Date();
-                document.getElementById('bookingCheckIn').value = today.toISOString().split('T')[0];
-                document.getElementById('bookingCheckOut').value = new Date(today.getTime() + 86400000 * 3).toISOString().split('T')[0];
-                document.getElementById('bookingCheckInTime').value = '14:00';
-                document.getElementById('bookingCheckOutTime').value = '11:00';
-
-                // Initialize booking date filter to current month
-                const now = new Date();
-                const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-                const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-                document.getElementById('bookingFilterStart').value = firstDay.toISOString().split('T')[0];
-                document.getElementById('bookingFilterEnd').value = lastDay.toISOString().split('T')[0];
-                bookingFilterStart = firstDay.toISOString().split('T')[0];
-                bookingFilterEnd = lastDay.toISOString().split('T')[0];
-                applyBookingFilter('month');
             } catch (e) { console.error(e); }
         });
-
-        async function loadBookingExchangeRate() {
-            const label = document.getElementById('bookingExchangeRateLabel');
-            try {
-                bookingExchangeRate = await ExchangeRateService.loadUsdToLkrRate(db);
-                if (label) label.textContent = ExchangeRateService.describeRate(bookingExchangeRate);
-            } catch (error) {
-                bookingExchangeRate = null;
-                if (label) label.textContent = 'Exchange rate unavailable: ' + error.message;
-            }
-            renderBookings();
-        }
-
-        function bookingReportAmount(booking) {
-            const original = FinanceUtils.normalizeCurrency(booking.currency);
-            return FinanceUtils.convertAmountOrUnavailable(
-                booking.totalAmount,
-                original,
-                bookingDisplayCurrency,
-                bookingExchangeRate && bookingExchangeRate.rate
-            );
-        }
-
-        // --- LOAD PACKAGES FROM FIREBASE ---
-        async function loadPackages() {
-            try {
-                const snap = await db.collection('packages').where('hotelId', '==', hotelId).orderBy('name', 'asc').get();
-                packages = [];
-                snap.forEach(d => packages.push({ id: d.id, ...d.data() }));
-                populatePackageSelect();
-                populateEditPackageSelect();
-            } catch (e) {
-                console.error('Error loading packages:', e);
-                const sel = document.getElementById('bookingMeals');
-                if (sel) {
-                    sel.innerHTML = '<option value="">Error loading packages</option>';
-                }
-            }
-        }
-
-        // --- POPULATE PACKAGE DROPDOWN (Booking Form) ---
-        function populatePackageSelect() {
-            const sel = document.getElementById('bookingMeals');
-            if (!sel) return;
-
-            if (!packages.length) {
-                sel.innerHTML = '<option value="">No packages available</option>';
-                return;
-            }
-
-            const currentVal = sel.value;
-            sel.innerHTML = '<option value="">Select Package</option>';
-            packages.forEach(p => {
-                const price = p.price || 0;
-                const option = document.createElement('option');
-                option.value = p.name;
-                option.textContent = `${p.name} - LKR ${price.toLocaleString()}`;
-                if (p.name === currentVal) {
-                    option.selected = true;
-                }
-                sel.appendChild(option);
-            });
-        }
-
-        // POPULATE PACKAGE DROPDOWN (Edit Modal)
-        function populateEditPackageSelect() {
-            const sel = document.getElementById('editBookingMeals');
-            if (!sel) return;
-
-            if (!packages.length) {
-                sel.innerHTML = '<option value="">No packages available</option>';
-                return;
-            }
-
-            sel.innerHTML = '<option value="">Select Package</option>';
-            packages.forEach(p => {
-                const price = p.price || 0;
-                const option = document.createElement('option');
-                option.value = p.name;
-                option.textContent = `${p.name} - LKR ${price.toLocaleString()}`;
-                sel.appendChild(option);
-            });
-        }
 
         async function loadRooms() {
             try {
@@ -1924,68 +1621,18 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 snap.forEach(d => rooms.push({ id: d.id, ...d.data() }));
                 rooms.sort((a, b) => (a.roomNumber || '').localeCompare(b.roomNumber || ''));
                 renderRooms();
-                populateRoomSelects();
-                populateEditRoomSelects();
                 updateStats();
-                checkAutoCheckout();
             } catch (e) {
                 const tbody = document.getElementById('roomTableBody');
-                if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading rooms.</td></tr>`;
+                if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading rooms.</td></tr>`;
             }
-        }
-
-        async function loadBookings() {
-            try {
-                const snap = await db.collection('bookings').where('hotelId', '==', hotelId).get();
-                bookings = [];
-                snap.forEach(d => bookings.push({ id: d.id, ...d.data() }));
-                bookings.sort((a, b) => (a.checkIn || '').localeCompare(b.checkIn || ''));
-                renderBookings();
-                renderCalendar();
-                updateStats();
-                checkAutoCheckout();
-            } catch (e) {
-                const tbody = document.getElementById('bookingTableBody');
-                if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="empty-state">Error loading bookings.</td></tr>`;
-            }
-        }
-
-        function populateRoomSelects() {
-            const availableRooms = rooms.filter(r => r.status === 'Available' || r.status === 'Cleaning');
-            const sel = document.getElementById('bookingRoom');
-            if (!sel) return;
-            const currentVal = sel.value;
-            sel.innerHTML = '<option value="">Select Room</option>';
-            availableRooms.forEach(r => {
-                sel.innerHTML += `<option value="${r.roomNumber}" ${r.roomNumber === currentVal ? 'selected' : ''}>${r.roomNumber} - ${r.roomType || 'Standard'} (LKR ${Number(r.rate || 0).toLocaleString()}/night)</option>`;
-            });
-        }
-
-        // Only show available rooms + current room in edit dropdown
-        function populateEditRoomSelects() {
-            const sel = document.getElementById('editBookingRoom');
-            if (!sel) return;
-            const currentVal = sel.value;
-            const currentBooking = bookings.find(b => b.id === editBookingId);
-            
-            sel.innerHTML = '<option value="">Select Room</option>';
-            
-            // Show available rooms + the currently booked room (if any)
-            rooms.forEach(r => {
-                const isAvailable = r.status === 'Available' || r.status === 'Cleaning';
-                const isCurrentRoom = currentBooking && r.roomNumber === currentBooking.roomNumber;
-                
-                if (isAvailable || isCurrentRoom) {
-                    sel.innerHTML += `<option value="${r.roomNumber}" ${r.roomNumber === currentVal ? 'selected' : ''}>${r.roomNumber} - ${r.roomType || 'Standard'} (LKR ${Number(r.rate || 0).toLocaleString()}/night) [${r.status || 'Available'}]</option>`;
-                }
-            });
         }
 
         function renderRooms() {
             const tbody = document.getElementById('roomTableBody');
             if (!tbody) return;
             if (!rooms.length) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No rooms added yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No rooms added yet.</td></tr>`;
                 return;
             }
             tbody.innerHTML = rooms.map((r, i) => `
@@ -1994,7 +1641,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     <td><strong>${r.roomNumber || 'N/A'}</strong></td>
                     <td>${r.roomType || 'N/A'}</td>
                     <td>${r.bedCount || '0'}</td>
-                    <td>LKR ${Number(r.rate || 0).toLocaleString()}</td>
                     <td><span class="status-badge ${(r.status || 'available').toLowerCase()}">${r.status || 'Available'}</span></td>
                     <td>
                         <button class="strip-link-btn edit-strip-btn" onclick="openEditRoomModal('${r.id}')">✏️</button>
@@ -2002,58 +1648,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                     </td>
                 </tr>
             `).join('');
-        }
-
-        // --- RENDER BOOKINGS WITH STATUS + DATE FILTER ---
-        function renderBookings() {
-            const tbody = document.getElementById('bookingTableBody');
-            if (!tbody) return;
-            let filtered = bookings;
-
-            // Apply status filter
-            if (currentBookingFilter !== 'all') {
-                filtered = filtered.filter(b => b.status === currentBookingFilter);
-            }
-
-            // Apply date filter
-            if (bookingFilterStart && bookingFilterEnd) {
-                filtered = filtered.filter(b => {
-                    if (!b.checkIn) return false;
-                    return b.checkIn >= bookingFilterStart && b.checkIn <= bookingFilterEnd;
-                });
-            }
-            const currencyFilter = document.getElementById('bookingCurrencyFilter')?.value || 'all';
-            if (currencyFilter !== 'all') filtered = filtered.filter(b => FinanceUtils.matchesOriginalCurrency(b, currencyFilter));
-
-            if (!filtered.length) {
-                tbody.innerHTML = `<tr><td colspan="11" class="empty-state">No bookings found.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filtered.map((b, i) => {
-                const statusClass = b.status || 'upcoming';
-                const paymentClass = b.paymentStatus || 'pending';
-                const checkInDisplay = b.checkIn ? (b.checkIn + (b.checkInTime ? ' ' + b.checkInTime : '')) : 'N/A';
-                const checkOutDisplay = b.checkOut ? (b.checkOut + (b.checkOutTime ? ' ' + b.checkOutTime : '')) : 'N/A';
-                return `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td><strong>${b.guestName || 'N/A'}</strong></td>
-                        <td>${b.nic || '-'}</td>
-                        <td>${b.phone || '-'}</td>
-                        <td>${b.roomNumber || 'N/A'}</td>
-                        <td>${checkInDisplay}</td>
-                        <td>${checkOutDisplay}</td>
-                        <td>${FinanceUtils.formatMoney(bookingReportAmount(b), bookingDisplayCurrency)} <small>(${FinanceUtils.normalizeCurrency(b.currency)} paid)</small></td>
-                        <td><span class="payment-status-badge ${paymentClass}">${paymentClass.charAt(0).toUpperCase() + paymentClass.slice(1)}</span></td>
-                        <td><span class="booking-status-badge ${statusClass}">${statusClass === 'checked_out_early' ? 'Early' : statusClass.charAt(0).toUpperCase() + statusClass.slice(1)}</span></td>
-                        <td>
-                            <button class="strip-link-btn edit-strip-btn" onclick="openEditBookingModal('${b.id}')">✏️</button>
-                            <button class="strip-link-btn delete-strip-btn" onclick="deleteBooking('${b.id}')">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
         }
 
         function updateStats() {
@@ -2066,220 +1660,12 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             const occupiedRoomsEl = document.getElementById('occupiedRooms');
             const availableRoomsEl = document.getElementById('availableRooms');
             const occupiedPercentEl = document.getElementById('occupiedPercent');
-            const bookingRevenueEl = document.getElementById('bookingRevenue');
-            const revenueCountEl = document.getElementById('revenueCount');
 
             if (totalRoomsEl) totalRoomsEl.textContent = total;
             if (occupiedRoomsEl) occupiedRoomsEl.textContent = occupied;
             if (availableRoomsEl) availableRoomsEl.textContent = available;
             if (occupiedPercentEl) occupiedPercentEl.textContent = rate + '%';
-
-            const paidBookings = bookings.filter(b => b.paymentStatus === 'paid');
-            const revenue = paidBookings.reduce((sum, b) => sum + bookingReportAmount(b), 0);
-            if (bookingRevenueEl) bookingRevenueEl.textContent = FinanceUtils.formatMoney(revenue, bookingDisplayCurrency);
-            if (revenueCountEl) revenueCountEl.textContent = paidBookings.length + ' bookings';
         }
-
-        function roomStatusForBookingStatus(status) {
-            if (status === 'upcoming') return 'Reserved';
-            if (status === 'active') return 'Occupied';
-            if (['past', 'checked_out_early', 'cancelled'].includes(status)) return 'Available';
-            return null;
-        }
-
-        // --- UPDATE ROOM STATUS BASED ON BOOKING STATUS ---
-        async function updateRoomStatusForBooking(booking) {
-            if (!booking || !booking.roomNumber) return;
-
-            const room = rooms.find(r => r.roomNumber === booking.roomNumber);
-            if (!room) return;
-
-            const newRoomStatus = roomStatusForBookingStatus(booking.status);
-            if (!newRoomStatus) return;
-
-            if (room.status !== newRoomStatus) {
-                await db.collection('rooms').doc(room.id).update({ status: newRoomStatus });
-                const roomIndex = rooms.findIndex(r => r.id === room.id);
-                if (roomIndex !== -1) {
-                    rooms[roomIndex].status = newRoomStatus;
-                }
-            }
-        }
-
-        // --- AUTO CHECKOUT ---
-        async function checkAutoCheckout() {
-            const today = new Date().toISOString().split('T')[0];
-            const activeBookings = bookings.filter(b => b.status === 'active' && b.checkOut && b.checkOut < today);
-            for (const b of activeBookings) {
-                try {
-                    await db.collection('bookings').doc(b.id).update({ status: 'past' });
-                    b.status = 'past';
-                    await updateRoomStatusForBooking(b);
-                    console.log(`✅ Auto-checked out booking ${b.id} (${b.guestName})`);
-                } catch (e) { console.error('Auto-checkout error:', e); }
-            }
-            if (activeBookings.length > 0) {
-                await loadBookings();
-                await loadRooms();
-                updateStats();
-                renderCalendar();
-            }
-        }
-
-        function renderCalendar() {
-            const grid = document.getElementById('calendarGrid');
-            if (!grid) return;
-            const year = currentMonth.getFullYear();
-            const month = currentMonth.getMonth();
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const label = document.getElementById('calendarMonthLabel');
-            if (label) label.textContent = monthNames[month] + ' ' + year;
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const today = new Date();
-            let html = '';
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            days.forEach(d => { html += `<div class="calendar-day-header">${d}</div>`; });
-            for (let i = 0; i < firstDay; i++) {
-                html += `<div class="calendar-day other-month"></div>`;
-            }
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
-                const dayBookings = bookings.filter(b => {
-                    if (!b.checkIn || !b.checkOut || b.status === 'cancelled') return false;
-                    return b.checkIn <= dateStr && b.checkOut >= dateStr;
-                });
-                html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
-                html += `<div class="day-number">${day}</div>`;
-                if (dayBookings.length > 0) {
-                    dayBookings.slice(0, 2).forEach(b => {
-                        const statusClass = b.status || 'upcoming';
-                        html += `<span class="booking-dot ${statusClass}">• ${b.guestName || 'Guest'}</span>`;
-                    });
-                    if (dayBookings.length > 2) {
-                        html += `<span class="booking-dot">+${dayBookings.length - 2} more</span>`;
-                    }
-                }
-                html += `</div>`;
-            }
-            grid.innerHTML = html;
-        }
-
-        function changeMonth(delta) {
-            if (delta === 0) { currentMonth = new Date(); }
-            else { currentMonth.setMonth(currentMonth.getMonth() + delta); }
-            renderCalendar();
-        }
-
-        // --- BOOKING DATE FILTER ---
-        function applyBookingFilter(period) {
-            const now = new Date();
-            let start, end;
-
-            if (period === 'today') {
-                start = now.toISOString().split('T')[0];
-                end = start;
-            } else if (period === 'week') {
-                const s = new Date(now);
-                s.setDate(now.getDate() - now.getDay());
-                start = s.toISOString().split('T')[0];
-                const e = new Date(s);
-                e.setDate(s.getDate() + 6);
-                end = e.toISOString().split('T')[0];
-            } else if (period === 'month') {
-                start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-                end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-            } else if (period === 'year') {
-                start = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
-                end = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0];
-            } else {
-                start = document.getElementById('bookingFilterStart').value;
-                end = document.getElementById('bookingFilterEnd').value;
-                if (!start || !end) { return; }
-            }
-
-            bookingFilterStart = start;
-            bookingFilterEnd = end;
-            renderBookings();
-        }
-
-        // --- BOOKING FILTER EVENT LISTENERS ---
-        const periodFilter = document.getElementById('bookingPeriodFilter');
-        if (periodFilter) {
-            periodFilter.addEventListener('change', function() {
-                const customInputs = document.querySelectorAll('#bookingFilterStart, #bookingFilterEnd');
-                if (this.value === 'custom') {
-                    customInputs.forEach(inp => { if (inp) inp.style.display = 'inline-block'; });
-                    const val = document.getElementById('bookingFilterStart').value;
-                    const val2 = document.getElementById('bookingFilterEnd').value;
-                    if (val && val2) applyBookingFilter('custom');
-                } else {
-                    customInputs.forEach(inp => { if (inp) inp.style.display = 'none'; });
-                    applyBookingFilter(this.value);
-                }
-            });
-        }
-
-        const filterStart = document.getElementById('bookingFilterStart');
-        const filterEnd = document.getElementById('bookingFilterEnd');
-        if (filterStart) {
-            filterStart.addEventListener('change', function() {
-                if (document.getElementById('bookingFilterEnd').value) {
-                    applyBookingFilter('custom');
-                }
-            });
-        }
-        if (filterEnd) {
-            filterEnd.addEventListener('change', function() {
-                if (document.getElementById('bookingFilterStart').value) {
-                    applyBookingFilter('custom');
-                }
-            });
-        }
-
-        // --- CALCULATE PRICE ---
-        function calculatePrice() {
-            const roomSelect = document.getElementById('bookingRoom');
-            const mealSelect = document.getElementById('bookingMeals');
-            const guestCount = parseInt(document.getElementById('bookingGuestCount').value) || 1;
-            const checkIn = document.getElementById('bookingCheckIn').value;
-            const checkOut = document.getElementById('bookingCheckOut').value;
-            const room = rooms.find(r => r.roomNumber === roomSelect.value);
-            const mealName = mealSelect.value;
-
-            const selectedPackage = packages.find(p => p.name === mealName);
-            const mealPrice = selectedPackage ? (selectedPackage.price || 0) : 0;
-
-            let nights = 0;
-            if (checkIn && checkOut) {
-                const d1 = new Date(checkIn);
-                const d2 = new Date(checkOut);
-                const diff = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24));
-                nights = diff > 0 ? diff : 1;
-            }
-            const roomRate = room ? (room.rate || 0) : 0;
-            const roomTotal = roomRate * nights;
-            const mealTotal = mealPrice * guestCount * nights;
-            const grandTotal = roomTotal + mealTotal;
-
-            const pbRoom = document.getElementById('pbRoom');
-            const pbMeals = document.getElementById('pbMeals');
-            const pbTotal = document.getElementById('pbTotal');
-            if (pbRoom) pbRoom.textContent = `LKR ${roomRate.toLocaleString()} × ${nights} nights = LKR ${roomTotal.toLocaleString()}`;
-            if (pbMeals) pbMeals.textContent = `LKR ${mealPrice.toLocaleString()} × ${guestCount} guests × ${nights} nights = LKR ${mealTotal.toLocaleString()}`;
-            if (pbTotal) pbTotal.textContent = 'LKR ' + grandTotal.toLocaleString();
-
-            return { roomTotal, mealTotal, grandTotal, nights, roomRate, mealPrice };
-        }
-
-        ['bookingRoom', 'bookingMeals', 'bookingGuestCount', 'bookingCheckIn', 'bookingCheckOut'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('change', calculatePrice);
-                el.addEventListener('input', calculatePrice);
-            }
-        });
 
         // --- ADD ROOM ---
         const roomForm = document.getElementById('roomForm');
@@ -2297,9 +1683,8 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 let bedCount = bedSelect.value;
                 if (bedCount === 'Custom' && bedCustom.value.trim()) { bedCount = bedCustom.value.trim(); }
                 else if (bedCount === 'Custom' || !bedCount) { alert('Please select or enter bed count.'); return; }
-                const rate = parseFloat(document.getElementById('roomRate').value);
                 const status = document.getElementById('roomStatus').value;
-                if (!roomNumber || !roomType || !bedCount || isNaN(rate) || !status) {
+                if (!roomNumber || !roomType || !bedCount || !status) {
                     alert('Please fill in all required fields.');
                     return;
                 }
@@ -2308,14 +1693,13 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 btn.disabled = true;
                 try {
                     await db.collection('rooms').add({
-                        hotelId, roomNumber, roomType, bedCount, rate, status, createdAt: new Date()
+                        hotelId, roomNumber, roomType, bedCount, status, createdAt: new Date()
                     });
                     document.getElementById('roomForm').reset();
                     document.getElementById('roomTypeCustom').style.display = 'none';
                     document.getElementById('bedCountCustom').style.display = 'none';
                     alert('✅ Room added successfully!');
                     await loadRooms();
-                    updateStats();
                 } catch (error) {
                     alert('Error adding room: ' + error.message);
                 }
@@ -2329,7 +1713,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             try {
                 await db.collection('rooms').doc(id).delete();
                 await loadRooms();
-                updateStats();
             } catch (e) { alert('Error: ' + e.message); }
         }
 
@@ -2343,7 +1726,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
             document.getElementById('editRoomNumber').value = room.roomNumber || '';
             document.getElementById('editRoomType').value = room.roomType || '';
             document.getElementById('editRoomBeds').value = room.bedCount || '';
-            document.getElementById('editRoomRate').value = room.rate || '';
             document.getElementById('editRoomStatus').value = room.status || 'Available';
             document.getElementById('editRoomModal').classList.add('show');
         }
@@ -2359,20 +1741,18 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 const roomNumber = document.getElementById('editRoomNumber').value.trim();
                 const roomType = document.getElementById('editRoomType').value.trim();
                 const bedCount = document.getElementById('editRoomBeds').value.trim();
-                const rate = parseFloat(document.getElementById('editRoomRate').value);
                 const status = document.getElementById('editRoomStatus').value;
-                if (!roomNumber || !roomType || !bedCount || isNaN(rate)) {
+                if (!roomNumber || !roomType || !bedCount || !status) {
                     alert('Please fill in all fields.');
                     return;
                 }
                 try {
                     await db.collection('rooms').doc(id).update({
-                        roomNumber, roomType, bedCount, rate, status
+                        roomNumber, roomType, bedCount, status
                     });
                     alert('✅ Room updated!');
                     closeEditRoomModal();
                     await loadRooms();
-                    updateStats();
                 } catch (e) { alert('Error: ' + e.message); }
             });
         }
@@ -2382,350 +1762,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 if (e.target === this) closeEditRoomModal();
             });
         }
-
-        // --- ADD BOOKING ---
-        const bookingForm = document.getElementById('bookingForm');
-        if (bookingForm) {
-            bookingForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const guestName = document.getElementById('bookingGuestName').value.trim();
-                const nic = document.getElementById('bookingNic').value.trim();
-                const phone = document.getElementById('bookingPhone').value.trim();
-                const guestCount = parseInt(document.getElementById('bookingGuestCount').value) || 1;
-                const roomNumber = document.getElementById('bookingRoom').value;
-                const checkIn = document.getElementById('bookingCheckIn').value;
-                const checkInTime = document.getElementById('bookingCheckInTime').value || '14:00';
-                const checkOut = document.getElementById('bookingCheckOut').value;
-                const checkOutTime = document.getElementById('bookingCheckOutTime').value || '11:00';
-                const mealPackage = document.getElementById('bookingMeals').value;
-                const paymentStatus = document.getElementById('bookingPaymentStatus').value;
-                const currency = (document.getElementById('bookingCurrency')?.value || 'LKR').toUpperCase();
-                const bookingChannelSelect = document.getElementById('bookingChannel');
-                const bookingChannelCustom = document.getElementById('bookingChannelCustom');
-                const bookingChannel = bookingChannelSelect
-                    ? (bookingChannelSelect.value === 'Custom' ? bookingChannelCustom?.value.trim() : bookingChannelSelect.value)
-                    : '';
-                const notes = document.getElementById('bookingNotes').value.trim();
-
-                if (!guestName || !roomNumber || !checkIn || !checkOut) {
-                    alert('Please fill in all required fields.');
-                    return;
-                }
-
-                const { grandTotal } = calculatePrice();
-                if (grandTotal <= 0) {
-                    alert('Please check your dates and room selection.');
-                    return;
-                }
-
-                const btn = document.getElementById('submitBookingBtn');
-                btn.textContent = 'Creating...';
-                btn.disabled = true;
-
-                try {
-                    const bookingRef = db.collection('bookings').doc();
-                    const booking = {
-                        hotelId, guestName, nic: nic || '', phone: phone || '', guestCount, roomNumber,
-                        checkIn, checkInTime, checkOut, checkOutTime,
-                        mealPackage, totalAmount: grandTotal, currency, bookingChannel,
-                        paymentStatus: paymentStatus,
-                        status: 'upcoming',
-                        notes: notes || '',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    const batch = db.batch();
-                    batch.set(bookingRef, booking);
-
-                    // UPDATE ROOM STATUS TO RESERVED
-                    const room = rooms.find(r => r.roomNumber === roomNumber);
-                    if (room && (room.status === 'Available' || room.status === 'Cleaning')) {
-                        batch.update(db.collection('rooms').doc(room.id), { status: 'Reserved' });
-                    }
-
-                    // Auto-income if paid
-                    const income = FinanceUtils.buildBookingIncome(bookingRef.id, booking);
-                    if (income) {
-                        batch.set(db.collection('income').doc(FinanceUtils.bookingIncomeDocumentId(bookingRef.id)), {
-                            ...income,
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                    }
-                    await batch.commit();
-                    if (room && (room.status === 'Available' || room.status === 'Cleaning')) room.status = 'Reserved';
-
-                    alert('✅ Booking created!' + (paymentStatus === 'paid' ? ' Income record auto-generated.' : ''));
-                    bookingForm.reset();
-                    const today = new Date();
-                    document.getElementById('bookingCheckIn').value = today.toISOString().split('T')[0];
-                    document.getElementById('bookingCheckOut').value = new Date(today.getTime() + 86400000 * 3).toISOString().split('T')[0];
-                    document.getElementById('bookingCheckInTime').value = '14:00';
-                    document.getElementById('bookingCheckOutTime').value = '11:00';
-                    await loadBookings();
-                    await loadRooms();
-                    updateStats();
-                    renderCalendar();
-                    populateRoomSelects();
-                    populateEditRoomSelects();
-                    populatePackageSelect();
-                } catch (error) {
-                    alert('Error: ' + error.message);
-                }
-
-                btn.textContent = 'Create Booking';
-                btn.disabled = false;
-            });
-        }
-
-        // DELETE BOOKING - Removes linked income records
-        async function deleteBooking(id) {
-            if (!confirm('Delete this booking?')) return;
-            try {
-                const booking = bookings.find(b => b.id === id);
-                const batch = db.batch();
-                const canonicalIncomeRef = db.collection('income').doc(FinanceUtils.bookingIncomeDocumentId(id));
-                const incomeRefs = new Map([[canonicalIncomeRef.path, canonicalIncomeRef]]);
-                if (booking) {
-                    // REMOVE linked income records
-                    const incomeSnap = await db.collection('income')
-                        .where('bookingId', '==', id)
-                        .get();
-                    incomeSnap.forEach(doc => {
-                        if (!doc.data().hotelId || doc.data().hotelId === hotelId) incomeRefs.set(doc.ref.path, doc.ref);
-                    });
-                    
-                    // FREE THE ROOM
-                    const room = rooms.find(r => r.roomNumber === booking.roomNumber);
-                    if (room && room.status === 'Reserved') {
-                        batch.update(db.collection('rooms').doc(room.id), { status: 'Available' });
-                    }
-                }
-                incomeRefs.forEach(ref => batch.delete(ref));
-                batch.delete(db.collection('bookings').doc(id));
-                await batch.commit();
-                const room = booking && rooms.find(r => r.roomNumber === booking.roomNumber);
-                if (room && room.status === 'Reserved') room.status = 'Available';
-                await loadBookings();
-                await loadRooms();
-                updateStats();
-                renderCalendar();
-                populateRoomSelects();
-                populateEditRoomSelects();
-                populatePackageSelect();
-            } catch (e) { alert('Error: ' + e.message); }
-        }
-
-        // --- EDIT BOOKING MODAL ---
-        let editBookingId = null;
-
-        function openEditBookingModal(id) {
-            const b = bookings.find(bk => bk.id === id);
-            if (!b) { alert('Booking not found.'); return; }
-            editBookingId = id;
-            
-            // Store old payment status for comparison
-            oldPaymentStatus = b.paymentStatus || 'pending';
-            
-            document.getElementById('editBookingId').value = id;
-            document.getElementById('editBookingGuestName').value = b.guestName || '';
-            document.getElementById('editBookingNic').value = b.nic || '';
-            document.getElementById('editBookingPhone').value = b.phone || '';
-            // Populate room options first so the current room option exists, THEN select it
-            populateEditRoomSelects();
-            document.getElementById('editBookingRoom').value = b.roomNumber || '';
-            document.getElementById('editBookingCheckIn').value = b.checkIn || '';
-            document.getElementById('editBookingCheckInTime').value = b.checkInTime || '14:00';
-            document.getElementById('editBookingCheckOut').value = b.checkOut || '';
-            document.getElementById('editBookingCheckOutTime').value = b.checkOutTime || '11:00';
-            document.getElementById('editBookingStatus').value = b.status || 'upcoming';
-            document.getElementById('editBookingPaymentStatus').value = b.paymentStatus || 'pending';
-            const currencyInput = document.getElementById('editBookingCurrency');
-            if (currencyInput) currencyInput.value = b.currency || 'LKR';
-            const channelInput = document.getElementById('editBookingChannel');
-            if (channelInput) channelInput.value = b.bookingChannel || '';
-            
-            // Set guest count
-            document.getElementById('editBookingGuestCount').value = b.guestCount || 1;
-            
-            // Populate meals dropdown first, THEN set the value
-            populateEditPackageSelect();
-            const mealSelect = document.getElementById('editBookingMeals');
-            if (mealSelect) {
-                mealSelect.value = b.mealPackage || '';
-            }
-            
-            document.getElementById('editBookingManualAmount').value = b.manualAmount || 0;
-            document.getElementById('editBookingNotes').value = b.notes || '';
-
-            document.getElementById('editBookingModal').classList.add('show');
-        }
-
-        function closeEditBookingModal() {
-            document.getElementById('editBookingModal').classList.remove('show');
-            editBookingId = null;
-            oldPaymentStatus = null;
-        }
-
-        // EDIT BOOKING SUBMIT HANDLER - FIXED: Updates income when total changes while status is 'paid'
-        const editBookingForm = document.getElementById('editBookingForm');
-        if (editBookingForm) {
-            editBookingForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const id = document.getElementById('editBookingId').value;
-                const guestName = document.getElementById('editBookingGuestName').value.trim();
-                const nic = document.getElementById('editBookingNic').value.trim();
-                const phone = document.getElementById('editBookingPhone').value.trim();
-                const roomNumber = document.getElementById('editBookingRoom').value;
-                const checkIn = document.getElementById('editBookingCheckIn').value;
-                const checkInTime = document.getElementById('editBookingCheckInTime').value || '14:00';
-                const checkOut = document.getElementById('editBookingCheckOut').value;
-                const checkOutTime = document.getElementById('editBookingCheckOutTime').value || '11:00';
-                const status = document.getElementById('editBookingStatus').value;
-                const paymentStatus = document.getElementById('editBookingPaymentStatus').value;
-                const existingBooking = bookings.find(booking => booking.id === id);
-                const currency = (document.getElementById('editBookingCurrency')?.value || document.getElementById('bookingCurrency')?.value || existingBooking?.currency || 'LKR').toUpperCase();
-                const bookingChannelSelect = document.getElementById('editBookingChannel');
-                const bookingChannelCustom = document.getElementById('editBookingChannelCustom');
-                const bookingChannel = bookingChannelSelect
-                    ? (bookingChannelSelect.value === 'Custom' ? bookingChannelCustom?.value.trim() : bookingChannelSelect.value)
-                    : (existingBooking?.bookingChannel || '');
-                const manualAmount = parseFloat(document.getElementById('editBookingManualAmount').value) || 0;
-                const notes = document.getElementById('editBookingNotes').value.trim();
-                
-                const guestCount = parseInt(document.getElementById('editBookingGuestCount').value) || 1;
-                const mealPackage = document.getElementById('editBookingMeals').value;
-
-                if (!guestName || !roomNumber || !checkIn || !checkOut) {
-                    alert('Please fill in all fields.');
-                    return;
-                }
-
-                const btn = document.querySelector('#editBookingModal .btn-submit');
-                btn.textContent = 'Updating...';
-                btn.disabled = true;
-
-                try {
-                    const oldBooking = existingBooking;
-
-                    // Calculate total amount based on status
-                    let newTotalAmount = 0;
-                    if (status === 'checked_out_early') {
-                        newTotalAmount = manualAmount;
-                    } else {
-                        const room = rooms.find(r => r.roomNumber === roomNumber);
-                        const roomRate = room ? (room.rate || 0) : 0;
-                        const d1 = new Date(checkIn);
-                        const d2 = new Date(checkOut);
-                        const nights = Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)) || 1;
-                        
-                        let mealPrice = 0;
-                        if (mealPackage) {
-                            const selectedPackage = packages.find(p => p.name === mealPackage);
-                            if (selectedPackage) {
-                                mealPrice = selectedPackage.price || 0;
-                            }
-                        }
-                        const roomTotal = roomRate * nights;
-                        const mealTotal = mealPrice * guestCount * nights;
-                        newTotalAmount = roomTotal + mealTotal;
-                    }
-
-                    const bookingUpdate = {
-                        guestName, nic: nic || '', phone: phone || '', roomNumber,
-                        checkIn, checkInTime, checkOut, checkOutTime,
-                        status, paymentStatus,
-                        guestCount: guestCount,
-                        mealPackage: mealPackage || '', currency, bookingChannel,
-                        totalAmount: newTotalAmount,
-                        manualAmount: status === 'checked_out_early' ? manualAmount : 0,
-                        notes: notes || '',
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    const updatedBooking = { ...oldBooking, ...bookingUpdate, hotelId };
-                    const linkedIncomeSnapshot = await db.collection('income').where('bookingId', '==', id).get();
-                    const canonicalIncomeRef = db.collection('income').doc(FinanceUtils.bookingIncomeDocumentId(id));
-                    const now = firebase.firestore.FieldValue.serverTimestamp();
-                    const batch = db.batch();
-                    batch.update(db.collection('bookings').doc(id), bookingUpdate);
-
-                    const linkedIncomeRefs = new Map([[canonicalIncomeRef.path, canonicalIncomeRef]]);
-                    let canonicalIncomeSnapshot = null;
-                    linkedIncomeSnapshot.forEach(doc => {
-                        if (!doc.data().hotelId || doc.data().hotelId === hotelId) {
-                            linkedIncomeRefs.set(doc.ref.path, doc.ref);
-                            if (doc.ref.path === canonicalIncomeRef.path) canonicalIncomeSnapshot = doc;
-                        }
-                    });
-
-                    const income = FinanceUtils.buildBookingIncome(id, updatedBooking);
-                    if (income) {
-                        linkedIncomeRefs.forEach((ref, path) => {
-                            if (path !== canonicalIncomeRef.path) batch.delete(ref);
-                        });
-                        batch.set(canonicalIncomeRef, {
-                            ...income,
-                            createdAt: canonicalIncomeSnapshot?.data().createdAt || now,
-                            updatedAt: now
-                        }, { merge: true });
-                    } else {
-                        linkedIncomeRefs.forEach(ref => batch.delete(ref));
-                    }
-
-                    const oldRoom = oldBooking && rooms.find(r => r.roomNumber === oldBooking.roomNumber);
-                    const newRoom = rooms.find(r => r.roomNumber === roomNumber);
-                    const newRoomStatus = roomStatusForBookingStatus(status);
-                    if (oldRoom && oldRoom.roomNumber !== roomNumber) {
-                        batch.update(db.collection('rooms').doc(oldRoom.id), { status: 'Available' });
-                    }
-                    if (newRoom && newRoomStatus) {
-                        batch.update(db.collection('rooms').doc(newRoom.id), { status: newRoomStatus });
-                    }
-
-                    await batch.commit();
-                    if (oldRoom && oldRoom.roomNumber !== roomNumber) oldRoom.status = 'Available';
-                    if (newRoom && newRoomStatus) newRoom.status = newRoomStatus;
-
-                    alert('✅ Booking updated!');
-                    closeEditBookingModal();
-                    await loadBookings();
-                    await loadRooms();
-                    updateStats();
-                    renderCalendar();
-                    populateRoomSelects();
-                    populateEditRoomSelects();
-                    populatePackageSelect();
-                } catch (error) {
-                    alert('Error: ' + error.message);
-                }
-
-                btn.textContent = 'Update Booking';
-                btn.disabled = false;
-            });
-        }
-
-        const editBookingModal = document.getElementById('editBookingModal');
-        if (editBookingModal) {
-            editBookingModal.addEventListener('click', function(e) {
-                if (e.target === this) closeEditBookingModal();
-            });
-        }
-
-        // --- FILTERS ---
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentBookingFilter = this.dataset.filter;
-                renderBookings();
-            });
-        });
-        document.getElementById('bookingCurrencyFilter').addEventListener('change', renderBookings);
-        document.getElementById('bookingDisplayCurrency').addEventListener('change', function() {
-            bookingDisplayCurrency = FinanceUtils.normalizeCurrency(this.value);
-            renderBookings();
-        });
 
         // --- TYPE / BED TOGGLES ---
         const roomTypeSelect = document.getElementById('roomTypeSelect');
@@ -2744,47 +1780,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
         }
 
         // --- REPORTS ---
-        const downloadBookingBtn = document.getElementById('downloadBookingReportBtn');
-        if (downloadBookingBtn) {
-            downloadBookingBtn.addEventListener('click', function() {
-                const { jsPDF } = window.jspdf;
-                const currencyFilter = document.getElementById('bookingCurrencyFilter').value;
-                const filtered = bookings.filter(b => b.status !== 'cancelled' && FinanceUtils.matchesOriginalCurrency(b, currencyFilter));
-                if (!filtered.length) { alert('No bookings to export.'); return; }
-                const doc = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const margin = 15;
-                doc.setFontSize(18);
-                doc.setTextColor(40, 40, 40);
-                doc.text('Bookings Report', pageWidth / 2, 20, { align: 'center' });
-                doc.setFontSize(10);
-                doc.setTextColor(100, 100, 100);
-                doc.text(`Hotel: ${currentUserData?.businessName || 'N/A'}`, margin, 30);
-                doc.text(`Generated: ${new Date().toLocaleString()}`, margin, 36);
-                const totalRevenue = filtered.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + bookingReportAmount(b), 0);
-                doc.setFontSize(11);
-                doc.setTextColor(60, 60, 60);
-                doc.text(`Total Revenue: ${FinanceUtils.formatMoney(totalRevenue, bookingDisplayCurrency)} (${filtered.length} bookings)`, margin, 46);
-                doc.text(ExchangeRateService.describeRate(bookingExchangeRate), margin, 51);
-                const headers = ['#', 'Guest', 'NIC', 'Phone', 'Room', 'Check-In', 'Check-Out', 'Paid Currency', `Total (${bookingDisplayCurrency})`, 'Payment', 'Status'];
-                const rows = filtered.map((b, i) => [
-                    i + 1, b.guestName || 'N/A', b.nic || '-', b.phone || '-', b.roomNumber || 'N/A',
-                    b.checkIn + (b.checkInTime ? ' ' + b.checkInTime : ''),
-                    b.checkOut + (b.checkOutTime ? ' ' + b.checkOutTime : ''),
-                    FinanceUtils.normalizeCurrency(b.currency),
-                    FinanceUtils.formatAmountNumber(bookingReportAmount(b), bookingDisplayCurrency),
-                    b.paymentStatus || 'pending',
-                    b.status || 'N/A'
-                ]);
-                doc.autoTable({
-                    startY: 57, head: [headers], body: rows, theme: 'striped',
-                    headStyles: { fillColor: [85, 115, 115], textColor: [255, 255, 255] },
-                    styles: { fontSize: 7 }, margin: { left: margin, right: margin }
-                });
-                doc.save(`bookings-report-${new Date().toISOString().slice(0,10)}.pdf`);
-            });
-        }
-
         const downloadRoomBtn = document.getElementById('downloadRoomReportBtn');
         if (downloadRoomBtn) {
             downloadRoomBtn.addEventListener('click', function() {
@@ -2807,10 +1802,10 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 doc.setFontSize(11);
                 doc.setTextColor(60, 60, 60);
                 doc.text(`Total: ${total} | Occupied: ${occupied} | Available: ${available} | Occupancy Rate: ${rate}%`, margin, 46);
-                const headers = ['#', 'Room', 'Type', 'Beds', 'Rate (LKR)', 'Status'];
+                const headers = ['#', 'Room', 'Type', 'Beds', 'Status'];
                 const rows = rooms.map((r, i) => [
                     i + 1, r.roomNumber || 'N/A', r.roomType || 'N/A', r.bedCount || '0',
-                    Number(r.rate || 0).toLocaleString(), r.status || 'N/A'
+                    r.status || 'N/A'
                 ]);
                 doc.autoTable({
                     startY: 52, head: [headers], body: rows, theme: 'striped',
@@ -2834,9 +1829,6 @@ select.screenshot-input, .luxury-select { color: #1c1b16 !important; }
                 gsap.to(container, { opacity: 1, y: 0, duration: 1.0 });
             });
         });
-
-        // Run auto-checkout every minute
-        setInterval(checkAutoCheckout, 60000);
     </script>
 
     <!-- --- EDIT PROFILE MODAL --- -->

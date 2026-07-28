@@ -37,19 +37,20 @@ if (PASSWORD_LOOKUP_SECRET.length < 32) {
 // FIREBASE ADMIN
 // --------------------------------------------------
 
-if (admin.apps.length === 0) {
+try {
+    admin.app();
+} catch (e) {
     admin.initializeApp({
         credential:
-            admin.credential.cert(serviceAccount)
+            admin.cert(serviceAccount)
     });
 }
 
-const db = admin.firestore();
-const firebaseAuth = admin.auth();
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getAuth } = require("firebase-admin/auth");
 
-const {
-    FieldValue
-} = admin.firestore;
+const db = getFirestore();
+const firebaseAuth = getAuth();
 
 // --------------------------------------------------
 // EXPRESS
@@ -724,31 +725,190 @@ app.get(
     }
 );
 
-app.get(
-    "/api/test-firebase",
+app.post(
+    "/api/signup",
     asyncRoute(
         async (
             request,
             response
         ) => {
-            await db
-                .collection("test")
-                .add({
-                    message:
-                        "Hello from backend!",
-                    timestamp:
-                        FieldValue
-                            .serverTimestamp()
+            const body = request.body || {};
+            const username = normaliseUsername(body.username);
+            const password = String(body.password || "");
+            const businessName = normaliseText(body.businessName);
+            const city = normaliseText(body.city);
+
+            if (!username || !password || !businessName || !city) {
+                throw new HttpError(
+                    400,
+                    "Please fill in all fields.",
+                    "missing-fields"
+                );
+            }
+
+            if (
+                !ALLOWED_USERNAME_PATTERN.test(username)
+            ) {
+                throw new HttpError(
+                    400,
+                    "Username must contain 3-40 lowercase letters, numbers, dots, underscores or hyphens.",
+                    "invalid-username"
+                );
+            }
+
+            if (
+                username === "owner" ||
+                username === "admin"
+            ) {
+                throw new HttpError(
+                    409,
+                    "Username already taken",
+                    "username-taken"
+                );
+            }
+
+            if (password.length < 8) {
+                throw new HttpError(
+                    400,
+                    "Password must contain at least 8 characters.",
+                    "weak-password"
+                );
+            }
+
+            if (password.length > 128) {
+                throw new HttpError(
+                    400,
+                    "Password is too long.",
+                    "invalid-password"
+                );
+            }
+
+            if (businessName.length < 2 || businessName.length > 100) {
+                throw new HttpError(
+                    400,
+                    "Business name must contain between 2 and 100 characters.",
+                    "invalid-business-name"
+                );
+            }
+
+            if (city.length < 2 || city.length > 100) {
+                throw new HttpError(
+                    400,
+                    "City name must contain between 2 and 100 characters.",
+                    "invalid-city"
+                );
+            }
+
+            const syntheticEmail = buildSyntheticEmail(username);
+
+            // Generate unique user doc ID first so we can tie Auth uid and Firestore users collection doc id together.
+            const userRef = db.collection("users").doc();
+            const userUid = userRef.id;
+
+            let createdAuthUser = null;
+            let usernameReference = null;
+            let passwordReference = null;
+            let credentialsReserved = false;
+
+            try {
+                // Reserve credentials in transaction
+                const reservations = await reserveCredentials({
+                    username,
+                    password,
+                    managerUid: userUid,
+                    hotelId: userUid
                 });
 
-            response.json({
-                success: true,
-                message:
-                    "Firebase is connected! ✅"
-            });
+                usernameReference = reservations.usernameReference;
+                passwordReference = reservations.passwordReference;
+                credentialsReserved = true;
+
+                // Create Auth user
+                createdAuthUser = await firebaseAuth.createUser({
+                    uid: userUid,
+                    email: syntheticEmail,
+                    password,
+                    displayName: businessName,
+                    disabled: false
+                });
+
+                // Set Firestore profile documents
+                const batch = db.batch();
+
+                batch.create(userRef, {
+                    role: MANAGER_ROLE,
+                    hotelId: userUid,
+                    username,
+                    businessName,
+                    city,
+                    email: syntheticEmail,
+                    createdAt: FieldValue.serverTimestamp(),
+                    updatedAt: FieldValue.serverTimestamp()
+                });
+
+                const hotelRef = db.collection("hotels").doc(userUid);
+                batch.create(hotelRef, {
+                    name: businessName,
+                    city,
+                    managerId: userUid,
+                    createdAt: FieldValue.serverTimestamp(),
+                    updatedAt: FieldValue.serverTimestamp()
+                });
+
+                batch.update(usernameReference, {
+                    status: "active",
+                    uid: userUid,
+                    activatedAt: FieldValue.serverTimestamp()
+                });
+
+                batch.update(passwordReference, {
+                    status: "active",
+                    uid: userUid,
+                    activatedAt: FieldValue.serverTimestamp()
+                });
+
+                await batch.commit();
+
+                response.status(201).json({
+                    success: true,
+                    message: "Manager signup completed successfully.",
+                    uid: userUid
+                });
+
+            } catch (error) {
+                // Rollback Auth User
+                if (createdAuthUser) {
+                    try {
+                        await firebaseAuth.deleteUser(userUid);
+                    } catch (deleteAuthError) {
+                        console.error("Unable to roll back Firebase Auth user during signup failure:", deleteAuthError);
+                    }
+                }
+
+                // Rollback Credential Reservations
+                if (credentialsReserved && usernameReference && passwordReference) {
+                    await removePendingReservations(usernameReference, passwordReference);
+                }
+
+                // Map firebase auth error codes to HTTP responses
+                if (
+                    error.code === "auth/email-already-exists" ||
+                    error.code === "auth/uid-already-exists"
+                ) {
+                    throw new HttpError(
+                        409,
+                        "Username already taken",
+                        "username-taken"
+                    );
+                }
+
+                throw error;
+            }
         }
     )
 );
+
+
 
 /**
  * List staff login accounts for the authenticated
